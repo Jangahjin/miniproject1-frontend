@@ -101,13 +101,14 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 **메모**: 백엔드가 아직 없어 지금은 실행 불가. 백엔드가 T-03까지 진행되어 `/swagger-ui.html`이 열리는 시점에 착수.
 
-### Task 007: 공통 컴포넌트 & 포맷 유틸
+### Task 007: 공통 컴포넌트 & 포맷 유틸 ✅ 완료
 
 **영역**: FE | **선행**: Task 002 | **대응 공식 Task**: T-04
 
-- [ ] `PriceTag`(천단위 콤마), `DistanceBadge`(1000m 기준 단위 전환)
-- [ ] `EmptyState`, `ErrorState`(재시도 버튼 포함), `LoadingSkeleton`
-- [ ] `lib/format.ts` — `formatPrice`, `formatDistance`, `formatRelativeDate`
+- [x] `lib/format.ts` — `formatPrice`, `formatDistance`, `formatRelativeDate`
+- [x] `components/ui/PriceTag.tsx`(천단위 콤마), `DistanceBadge.tsx`(1000m 기준 단위 전환)
+- [x] `EmptyState.tsx`, `ErrorState.tsx`(재시도 버튼 포함, `"use client"`), `LoadingSkeleton.tsx`
+- [ ] 스타일링(Tailwind/shadcn)은 아직 안 함 — 지금은 마크업·시그니처만
 
 ### Task 008: 루트 레이아웃 + 목데이터 고지 배너
 
