@@ -1,12 +1,25 @@
 "use client";
 
-import { Suspense, useEffect, useState, type FormEvent } from "react";
+import { Suspense, useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiFetch, ApiError } from "@/lib/api";
 import { PharmacyPicker, type PharmacySummary } from "@/components/pharmacy-picker";
 import { DrugAutocomplete } from "@/components/drug-autocomplete";
 import type { DrugSummary } from "@/hooks/use-drug-autocomplete";
 import { useReportDraft } from "@/hooks/use-report-draft";
+
+// API.md §6 "POST /api/v1/uploads" 응답 스키마
+interface UploadResponse {
+  id: number;
+  originalName: string;
+  contentType: string;
+  sizeBytes: number;
+  url: string;
+  createdAt: string;
+}
+
+const RECEIPT_ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const RECEIPT_MAX_BYTES = 5 * 1024 * 1024;
 
 // TODO: 백엔드 T-26이 준비되면 API.md §6 실제 응답과 대조해 필드명을 검증한다.
 interface PriceReportResponse {
@@ -49,6 +62,11 @@ function ReportForm() {
   const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [receiptPreviewUrl, setReceiptPreviewUrl] = useState<string | null>(null);
+  const [receiptFileName, setReceiptFileName] = useState<string | null>(null);
+  const [receiptError, setReceiptError] = useState<string | null>(null);
+  const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
+
   // ?pharmacyId= 프리필 — 약국 상세에서 "가격 제보하기"로 진입한 경우 (T-29 완료 판정)
   useEffect(() => {
     const pharmacyIdParam = searchParams.get("pharmacyId");
@@ -62,10 +80,73 @@ function ReportForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
+  // blob: URL은 브라우저 메모리를 쓰므로 페이지를 떠날 때 반드시 해제한다.
+  useEffect(() => {
+    return () => {
+      if (receiptPreviewUrl) URL.revokeObjectURL(receiptPreviewUrl);
+    };
+  }, [receiptPreviewUrl]);
+
   function handlePriceChange(raw: string) {
     const digits = raw.replace(/[^\d]/g, "").slice(0, 6);
     updateDraft({ price: digits });
     setPriceError(null);
+  }
+
+  async function handleReceiptChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = ""; // 같은 파일을 다시 골라도 onChange가 또 뜨도록 초기화한다.
+    if (!file) return;
+
+    setReceiptError(null);
+
+    // API.md §6 검증 규칙: jpg/png/webp만, 5MB 이하.
+    // 서버(T-27)가 최종 판정하지만, 사용자가 업로드 실패를 기다리지 않도록 화면에서 먼저 걸러준다.
+    if (!RECEIPT_ACCEPTED_TYPES.includes(file.type)) {
+      setReceiptError("jpg, png, webp 형식의 이미지만 올릴 수 있어요.");
+      return;
+    }
+    if (file.size > RECEIPT_MAX_BYTES) {
+      setReceiptError("파일 크기는 5MB 이하여야 해요.");
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    setReceiptPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return previewUrl;
+    });
+    setReceiptFileName(file.name);
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("purpose", "RECEIPT");
+
+    setIsUploadingReceipt(true);
+    try {
+      const uploaded = await apiFetch<UploadResponse>("/api/v1/uploads", {
+        method: "POST",
+        auth: true,
+        body: formData,
+      });
+      updateDraft({ receiptFileId: uploaded.id });
+    } catch (error) {
+      setReceiptError(
+        error instanceof ApiError ? error.message : "영수증 업로드에 실패했어요. 다시 시도해주세요."
+      );
+      clearReceipt();
+    } finally {
+      setIsUploadingReceipt(false);
+    }
+  }
+
+  function clearReceipt() {
+    setReceiptPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+    setReceiptFileName(null);
+    updateDraft({ receiptFileId: null });
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -112,6 +193,7 @@ function ReportForm() {
           drugId: draft.drugId,
           price,
           ...(draft.purchasedAt ? { purchasedAt: draft.purchasedAt } : {}),
+          ...(draft.receiptFileId ? { receiptFileId: draft.receiptFileId } : {}),
           ...(draft.memo ? { memo: draft.memo } : {}),
         }),
       });
@@ -220,8 +302,27 @@ function ReportForm() {
         />
 
         <label htmlFor="receipt">영수증 (선택)</label>
-        {/* 실제 업로드 연동은 Task 019(T-27, 백엔드 업로드 API 대기)에서 처리한다 */}
-        <input id="receipt" type="file" accept="image/jpeg,image/png,image/webp" disabled />
+        {receiptPreviewUrl ? (
+          <p>
+            {/* eslint-disable-next-line @next/next/no-img-element -- blob: URL 미리보기라 next/image 최적화 대상이 아니다 */}
+            <img src={receiptPreviewUrl} alt="영수증 미리보기" width={80} height={80} />
+            {receiptFileName}
+            {isUploadingReceipt && " (업로드 중...)"}
+            {draft.receiptFileId && !isUploadingReceipt && " (업로드 완료)"}{" "}
+            <button type="button" onClick={clearReceipt} disabled={isUploadingReceipt}>
+              삭제
+            </button>
+          </p>
+        ) : (
+          <input
+            id="receipt"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleReceiptChange}
+            disabled={isUploadingReceipt}
+          />
+        )}
+        {receiptError && <p role="alert">{receiptError}</p>}
 
         <label htmlFor="memo">메모</label>
         <textarea
@@ -240,7 +341,7 @@ function ReportForm() {
         </div>
       )}
 
-      <button type="submit" disabled={isSubmitting}>
+      <button type="submit" disabled={isSubmitting || isUploadingReceipt}>
         제보하기
       </button>
     </form>

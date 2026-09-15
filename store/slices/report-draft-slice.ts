@@ -8,6 +8,7 @@ export interface ReportDraft {
   packageUnit: string;
   price: string;
   purchasedAt: string;
+  receiptFileId: number | null;
   memo: string;
 }
 
@@ -19,6 +20,7 @@ const initialState: ReportDraft = {
   packageUnit: "",
   price: "",
   purchasedAt: "",
+  receiptFileId: null,
   memo: "",
 };
 

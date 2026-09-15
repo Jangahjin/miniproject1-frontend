@@ -255,14 +255,18 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - [x] `app/pharmacies/[id]/page.tsx`의 "가격 제보하기" 버튼을 `/reports/new?pharmacyId=`로 활성화 (프리필 로직 포함)
 - [x] `DrugAutocomplete`를 `hooks/use-debounced-value.ts` + `hooks/use-drug-autocomplete.ts`로 분리해 홈 화면(Task 011)과 이 폼이 공유 (T-29 "T-17 재사용" 요구사항)
 
-### Task 019: 영수증 업로드 필드 활성화 (T-29의 일부, 별도 공식 Task 아님)
+### Task 019: 영수증 업로드 필드 활성화 (T-29의 일부, 별도 공식 Task 아님) ✅ 완료 (백엔드 T-27 미존재로 실제 업로드 성공 미검증)
 
 **영역**: FE | **선행**: Task 018 | **의존**: 백엔드 T-27(영수증 업로드 API) — 현재 미존재
 
-> ⚠️ 이전에 "T-27"을 프론트 Task로 잘못 매핑했었음 — T-27은 백엔드 전용 업로드 API고, 프론트의 영수증 필드는 T-29 안에 이미 포함돼 있다. Task 018에서 `disabled` 파일 인풋만 자리를 잡아뒀고, 실제 `POST /api/v1/uploads` 연동은 T-27이 생겨야 가능하다.
+> ⚠️ 이전에 "T-27"을 프론트 Task로 잘못 매핑했었음 — T-27은 백엔드 전용 업로드 API고, 프론트의 영수증 필드는 T-29 안에 이미 포함돼 있다. Task 018에서 `disabled` 파일 인풋만 자리를 잡아뒀는데, API.md §6의 `POST /api/v1/uploads` 요청/응답 스키마가 이미 확정돼 있어 백엔드 없이도 연동 코드 자체는 스펙대로 작성 가능하다고 판단해 진행함.
 
-- [ ] `disabled` 해제, jpg/png/webp·5MB 이하 검증, 미리보기
-- [ ] 업로드 성공 시 받은 `receiptFileId`를 제보 제출 payload에 포함
+- [x] `disabled` 해제 — 파일 선택 시 `onChange`로 즉시 업로드 시도
+- [x] 클라이언트 사전 검증: `image/jpeg|png|webp`만, 5MB 이하 (API.md §6 규칙과 동일 기준, 서버 최종 판정 전 UX용)
+- [x] `URL.createObjectURL`로 미리보기 이미지 표시, 파일 교체/언마운트 시 `URL.revokeObjectURL`로 해제
+- [x] 업로드 성공 시 받은 `id`를 `reportDraftSlice.receiptFileId`에 저장, 제출 payload에 `receiptFileId` 포함 (API.md §6 필드명)
+- [x] 업로드 실패 시 `ApiError.message` 표시 + 선택 상태 초기화, 업로드 중엔 제출 버튼 비활성화
+- ⚠️ **미검증**: 실제 `POST /api/v1/uploads` 호출·413/415 에러 응답·성공 시 `id` 저장까지의 전체 흐름은 백엔드(T-27) 없이는 end-to-end로 확인 불가. `tsc`/`eslint`/`vitest`/`next build`만 통과 확인.
 
 ### Task 020: 내 제보 목록
 
