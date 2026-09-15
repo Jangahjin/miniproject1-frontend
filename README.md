@@ -144,17 +144,18 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - [x] `components/location-indicator.tsx` — 헤더에 연결, `npm run dev`로 "위치 설정 안 됨" 렌더링 확인
 - [x] `npx tsc --noEmit` 통과 중 discriminated union 초기값 관련 실제 타입 버그 발견·수정 (`: Type =` → `as Type` 캐스팅으로 createSlice 제네릭 추론 오류 해결)
 
-### Task 011: 홈 화면 + 약품 자동완성
+### Task 011: 홈 화면 + 약품 자동완성 ✅ 완료 (백엔드 의존 부분 제외)
 
 **영역**: FE | **선행**: Task 009, Task 010 | **대응 공식 Task**: T-17
 
-> 자동완성은 백엔드 T-13(`GET /api/v1/drugs?q=`)이 있어야 실제 동작 확인이 가능하다. 지금은 UI와 TanStack Query 연동 코드만 작성.
+> ⚠️ T-13(`GET /api/v1/drugs?q=`)가 없어 실제 자동완성 동작은 검증 못 함 — `DrugSummary` 필드명(`id`/`displayName`/`packageUnit`)은 API.md §3 추정치.
 
-- [ ] 중앙 검색창 + 인기 약품 칩 6~8개
-- [ ] TanStack Query `useQuery`로 `GET /api/v1/drugs?q=&size=8` (300ms 디바운스)
-- [ ] 결과 항목에 `displayName` + `packageUnit` 함께 표시
-- [ ] 키보드 내비게이션(↑↓/Enter/Esc), `role="combobox"` + `aria-activedescendant`
-- [ ] 선택 시 `/search?drugId={id}&lat=&lng=&radius=2000`으로 이동, 위치 없으면 Task 010 훅 먼저 실행
+- [x] `components/search/drug-search.tsx` — 중앙 검색창 + 인기 약품 칩 6개(타이레놀/게보린/판콜에이/베아제/펜잘/판피린)
+- [x] TanStack Query `useQuery`로 `GET /api/v1/drugs?q=&size=8` (300ms 디바운스, `useDebouncedValue` 자체 구현)
+- [x] 결과 항목에 `displayName` + `packageUnit` 함께 표시
+- [x] 키보드 내비게이션(↑↓/Enter/Esc), `role="combobox"` + `aria-activedescendant`
+- [x] 선택 시 `/search?drugId={id}&lat=&lng=&radius=2000`으로 이동, 위치 `idle`이면 Task 010의 `requestLocation` 먼저 호출
+- [x] `app/page.tsx`를 create-next-app 기본 템플릿에서 실제 홈 화면으로 교체, `npm run dev`로 렌더링 확인
 
 ### Task 012: 검색 결과 화면
 
