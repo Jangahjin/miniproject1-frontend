@@ -176,21 +176,28 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## 그룹 3 — 약국 상세 (공식 FS-3 대응)
 
-### Task 013: 약국 상세 페이지
+### Task 013: 약국 상세 페이지 ✅ 완료 (백엔드 의존 부분 제외)
 
-**영역**: FE | **선행**: Task 012 | **대응 공식 Task**: T-21 (⚠️ 이전에 T-19로 잘못 매핑했었음 — T-19는 백엔드 전용 API 태스크)
+**영역**: FE | **선행**: Task 012 | **대응 공식 Task**: T-21
 
-> T-19(백엔드, 약국 상세 API)가 있어야 실제 데이터 연동 가능. 지금은 UI만 작성 가능.
+> ⚠️ T-19(백엔드, 약국 상세 API)가 없어 실제 데이터 연동은 검증 못 함. 응답 타입은 API.md §4 예시 JSON을 그대로 반영(추정 아님).
 
-- [ ] `app/pharmacies/[id]/page.tsx` — 약국 정보(주소·전화 `tel:`·영업시간·거리), `drugPrices` 표(가격 오름차순, 전국 평균 대비 색상), "가격 제보하기" 버튼(FS-4 전까지 비활성)
+- [x] `app/pharmacies/[id]/page.tsx` — 약국 정보(주소·전화 `tel:`·카카오맵 길찾기 링크·영업시간·거리), `drugPrices` 표(가격 오름차순, 전국 평균 대비 색상)
+- [x] "가격 제보하기" 버튼 — FS-4(Task 018) 전까지 `disabled`
+- [x] `components/pharmacy-result-card.tsx`에서 약국명 클릭 시 상세 페이지로 이동 (T-21 완료 판정 항목)
+- [x] API 에러 시 크래시 없이 안내 메시지 — `curl`로 확인
 
-### Task 014: 가격 이력 차트
+### Task 014: 가격 이력 차트 ✅ 완료 (백엔드 의존 부분 제외)
 
-**영역**: FE | **선행**: Task 009, Task 013 | **대응 공식 Task**: T-21 (⚠️ 이전에 "T-20, T-21"로 잘못 적었음 — T-20은 백엔드 전용 API, 프론트 파트는 T-21 하나)
+**영역**: FE | **선행**: Task 009, Task 013 | **대응 공식 Task**: T-21
 
-> T-20(백엔드, 가격 이력 API)이 있어야 실제 데이터 연동 가능.
+> ⚠️ T-20(백엔드, 가격 이력 API)이 없어 실제 데이터 연동은 검증 못 함.
 
-- [ ] `components/price-history-chart.tsx` — Recharts 스파크라인, TanStack Query로 이력 fetch, `flagged:true` 점은 회색 점선+툴팁, 이력 1건이어도 안 깨지게
+- [x] `components/pharmacy-drug-prices.tsx` — 약품 행 클릭 시 펼침/접힘, 펼치면 `PriceHistoryChart` 렌더
+- [x] `components/price-history-chart.tsx` — Recharts `LineChart`, TanStack Query로 이력 fetch
+- [x] `flagged:true` 점은 회색 점(테두리 대시) + 툴팁에 "통계에서 제외된 제보" 표시
+- [x] 이력 0건이면 안내 메시지 표시 (코드로 분기 처리)
+- [ ] 이력 1건일 때 `LineChart`가 깨지지 않는지는 실제 데이터로 검증 못 함 — 백엔드 연동 후 확인 필요
 
 ### Task 015: 카카오맵 마커 연동
 

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PriceTag } from "@/components/ui/PriceTag";
 import { DistanceBadge } from "@/components/ui/DistanceBadge";
 import { formatRelativeDate } from "@/lib/format";
@@ -38,7 +39,7 @@ const BADGE_LABEL: Record<string, string> = {
 export function PharmacyResultCard({ item }: { item: SearchResultItem }) {
   return (
     <li aria-current={item.recommended ? "true" : undefined}>
-      <p>{item.pharmacy.name}</p>
+      <Link href={`/pharmacies/${item.pharmacy.id}`}>{item.pharmacy.name}</Link>
       <p>{item.pharmacy.addressRoad}</p>
       <p>
         <PriceTag price={item.price.repPrice} />
