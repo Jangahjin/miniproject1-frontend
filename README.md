@@ -65,6 +65,8 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ### Task 003: 공통 API 클라이언트 ✅ 완료
 
+> ⚠️ **실측 정정**: T-04 완료 판정에 "apiFetch 단위 테스트 4종 통과(정상/JSON 에러/비-JSON 에러/204)"가 있는데 이 Task에서 빠뜨렸다. 아직 테스트 도구 자체가 설치되어 있지 않아 지금 당장 충족 불가 — Task 026으로 분리해 뒤에서 처리한다.
+
 **영역**: FE | **선행**: Task 001 | **대응 공식 Task**: T-04
 
 - [x] `lib/api.ts` 단일 파일로 통합 (`lib/api/client.ts` + `lib/api/price.ts` 분리 구조 폐기)
@@ -244,3 +246,16 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 - [ ] 검색 → 결과 → 상세 → 제보 → 재검색 흐름 무중단 확인
 - [ ] 클린 클론 상태에서 README 절차만으로 재현 가능한지 확인
+
+---
+
+## 그룹 7 — 누락분 보강
+
+### Task 026: apiFetch 단위 테스트 (T-04 완료 판정 누락분)
+
+**영역**: FE | **선행**: Task 003 | **대응 공식 Task**: T-04
+
+> Task 003을 완료 처리할 때 빠뜨린 걸 여기서 보강한다. PRD §4가 프론트 유틸 테스트 도구로 Vitest를 이미 확정해뒀다 (열린 질문 아님).
+
+- [ ] Vitest devDependency 설치 + `package.json`에 `test` 스크립트 추가
+- [ ] `apiFetch` 단위 테스트 4종: 정상 응답 / JSON 에러 응답 / 비-JSON 에러 응답(예: HTML 에러 페이지) / `204 No Content`
