@@ -251,11 +251,13 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## 그룹 7 — 누락분 보강
 
-### Task 026: apiFetch 단위 테스트 (T-04 완료 판정 누락분)
+### Task 026: apiFetch 단위 테스트 (T-04 완료 판정 누락분) ✅ 완료
 
 **영역**: FE | **선행**: Task 003 | **대응 공식 Task**: T-04
 
-> Task 003을 완료 처리할 때 빠뜨린 걸 여기서 보강한다. PRD §4가 프론트 유틸 테스트 도구로 Vitest를 이미 확정해뒀다 (열린 질문 아님).
+> Task 003을 완료 처리할 때 빠뜨린 걸 여기서 보강했다. PRD §4가 프론트 유틸 테스트 도구로 Vitest를 이미 확정해뒀다 (열린 질문 아님).
+> ⚠️ **부수 발견**: `@types/node`가 `^20`으로 고정돼 있었는데, development-planner.md 고정 스택은 **Node.js 22**다. vitest 5가 `@types/node >=22`를 요구해 설치 중 충돌로 드러났다 — `^22.20.2`로 올려서 스펙에 맞춤.
 
-- [ ] Vitest devDependency 설치 + `package.json`에 `test` 스크립트 추가
-- [ ] `apiFetch` 단위 테스트 4종: 정상 응답 / JSON 에러 응답 / 비-JSON 에러 응답(예: HTML 에러 페이지) / `204 No Content`
+- [x] Vitest devDependency 설치 (`^5.0.0`) + `package.json`에 `test` 스크립트(`vitest run`) 추가
+- [x] `@types/node`를 `^20` → `^22.20.2`로 정정 (Node 22 고정 스펙 반영)
+- [x] `lib/api.test.ts` — `apiFetch` 단위 테스트 4종: 정상 응답 / JSON 에러 응답 / 비-JSON 에러 응답(HTML) / `204 No Content` — `npm test` 4개 전부 통과
