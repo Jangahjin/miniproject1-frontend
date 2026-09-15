@@ -132,17 +132,29 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## 그룹 2 — 최저가 검색 (공식 FS-2 대응, 핵심 슬라이스)
 
-### Task 010: 검색 홈 UI
+### Task 010: 위치 획득 및 지역 폴백
 
-**영역**: FE | **선행**: Task 008 | **대응 공식 Task**: T-16
+**영역**: FE | **선행**: Task 008, Task 009 | **대응 공식 Task**: T-16 (⚠️ 이전에 이 자리에 "검색 홈 UI"를 잘못 매핑했었음 — 실제 T-16은 위치 획득)
 
-- [ ] 약품 검색창, 위치 표시/재설정, 인기 약품 칩
+> T-16 완료 판정 중 "지역 선택 모달"은 백엔드 T-14(`GET /api/v1/regions`)가 있어야 실제 동작 확인이 가능하다. 백엔드가 없는 지금은 API 계약대로 호출 코드는 작성하되, 실제 응답 검증은 보류한다.
 
-### Task 011: 약품 자동완성
+- [ ] `store/slices/location-slice.ts`를 T-16 스펙의 상태 머신으로 교체 (`idle/requesting` → `granted`(GPS) / `fallback`(REGION) / `denied`/`unavailable`)
+- [ ] `hooks/use-user-location.ts` — `navigator.geolocation.getCurrentPosition({ enableHighAccuracy: false, timeout: 8000 })`, try/catch로 시크릿 모드 대비
+- [ ] `components/region-picker.tsx` — 거부/타임아웃 시 즉시 표시, `GET /api/v1/regions` 연동 (백엔드 대기)
+- [ ] `components/location-indicator.tsx` — 헤더에 현재 위치 표시, 클릭 시 재선택
+- [ ] `sessionStorage` 동기화로 페이지 이동 시 위치 유지
+
+### Task 011: 홈 화면 + 약품 자동완성
 
 **영역**: FE | **선행**: Task 009, Task 010 | **대응 공식 Task**: T-17
 
-- [ ] TanStack Query로 `GET /api/v1/drugs?q=` 연동한 자동완성
+> 자동완성은 백엔드 T-13(`GET /api/v1/drugs?q=`)이 있어야 실제 동작 확인이 가능하다. 지금은 UI와 TanStack Query 연동 코드만 작성.
+
+- [ ] 중앙 검색창 + 인기 약품 칩 6~8개
+- [ ] TanStack Query `useQuery`로 `GET /api/v1/drugs?q=&size=8` (300ms 디바운스)
+- [ ] 결과 항목에 `displayName` + `packageUnit` 함께 표시
+- [ ] 키보드 내비게이션(↑↓/Enter/Esc), `role="combobox"` + `aria-activedescendant`
+- [ ] 선택 시 `/search?drugId={id}&lat=&lng=&radius=2000`으로 이동, 위치 없으면 Task 010 훅 먼저 실행
 
 ### Task 012: 검색 결과 화면
 
