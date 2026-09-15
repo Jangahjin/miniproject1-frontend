@@ -237,23 +237,32 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - [x] `lib/api.ts`에 401 인터셉터 추가 — `auth:true` 호출이 401이면 `/api/auth/refresh` 1회 시도 후 재요청, 무한 루프 방지용 `isRetry` 플래그
 - [x] `components/auth-bootstrap.tsx` — 새로고침 시 `accessToken`이 없으면 refreshToken 쿠키로 세션 자동 복원 시도
 - [x] `components/auth-status.tsx` — 헤더에 닉네임/로그아웃 또는 로그인 링크 표시
-- [x] `middleware.ts` — `/reports/new`, `/me`, `/admin/*`를 refreshToken 쿠키 존재 여부로 보호, `?next=`로 복귀 경로 전달 (`curl`로 307 리다이렉트 확인)
+- [x] `proxy.ts`(Next.js 16에서 `middleware.ts`가 deprecated로 바뀐 이름) — `/reports/new`, `/me`, `/admin/*`를 refreshToken 쿠키 존재 여부로 보호, `?next=`로 복귀 경로 전달 (`curl`로 307 리다이렉트 확인)
 - [ ] "가입→로그인→헤더 표시→로그아웃", "만료 후 자동 갱신", "새로고침해도 유지" — 전부 실제 백엔드 필요, 미검증
 - **메모**: `lib/api.ts`가 `@/store`를 동적 import — Node 서버 프로세스에서 모듈이 프로세스 전역에 캐시되는 특성상 서버 컴포넌트 컨텍스트에서는 요청 간 상태 공유가 이론상 가능하나, `auth:true` 호출은 전부 클라이언트 컴포넌트에서만 발생하므로 이 스코프에서는 문제 없음
 
-### Task 018: 가격 제보 폼
+### Task 018: 가격 제보 폼 ✅ 완료 (백엔드 의존 부분 제외)
 
-**영역**: FE | **선행**: Task 017 | **대응 공식 Task**: T-26, T-29
+**영역**: FE | **선행**: Task 017 | **대응 공식 Task**: T-29
 
-- [ ] 약국 선택(검색/지도) → 약품 선택(자동완성) → 가격 → 구매일
-- [ ] `reportDraftSlice`(Redux Toolkit)로 임시 입력 보존 (비로그인 시 로그인 페이지 리다이렉트 후 복원)
-- [ ] 가격 100~200,000원 정수 검증 (React Hook Form + Zod)
+> ⚠️ T-26(백엔드, 가격 제보 생성 API)이 없어 실제 제출은 검증 못 함. `curl`로 보호 라우트 리다이렉트와 폼 렌더링만 확인.
+> **부수 발견**: 빌드 시 Next.js 16이 `middleware.ts`가 deprecated라고 경고 — `proxy.ts`로 이름과 export 함수명을 변경해 해결 (AGENTS.md가 경고한 breaking change 실사례).
 
-### Task 019: 영수증 업로드
+- [x] `app/reports/new/page.tsx` — 약국 선택(`PharmacyPicker`) → 약품 선택(`DrugAutocomplete`, T-17에서 분리해 재사용) → 가격 → (접힘) 구매일·영수증·메모
+- [x] `hooks/use-report-draft.ts` — `reportDraftSlice`를 sessionStorage와 동기화 (locationSlice와 동일 패턴). Redux 메모리만으로는 `/login` 리다이렉트(전체 페이지 이동)를 못 넘기므로 필수
+- [x] 가격 100~200,000원 정수 검증, 천단위 콤마 표시, 구매일 미래/180일 초과 과거 검증 (클라이언트단)
+- [x] 제출 성공(`flagged:false`) → 약국 상세로 이동 / `flagged:true` → 경고 메시지 노출 후 이동 / `409 DUPLICATE_REPORT` → 안내 메시지로 매핑
+- [x] `app/pharmacies/[id]/page.tsx`의 "가격 제보하기" 버튼을 `/reports/new?pharmacyId=`로 활성화 (프리필 로직 포함)
+- [x] `DrugAutocomplete`를 `hooks/use-debounced-value.ts` + `hooks/use-drug-autocomplete.ts`로 분리해 홈 화면(Task 011)과 이 폼이 공유 (T-29 "T-17 재사용" 요구사항)
 
-**영역**: FE | **선행**: Task 018 | **대응 공식 Task**: T-27 (P1 — 일정 빠듯하면 잘라낼 항목)
+### Task 019: 영수증 업로드 필드 활성화 (T-29의 일부, 별도 공식 Task 아님)
 
-- [ ] jpg/png/webp, 5MB 이하 첨부 필드, 미리보기 (필수 아님, OCR 없음)
+**영역**: FE | **선행**: Task 018 | **의존**: 백엔드 T-27(영수증 업로드 API) — 현재 미존재
+
+> ⚠️ 이전에 "T-27"을 프론트 Task로 잘못 매핑했었음 — T-27은 백엔드 전용 업로드 API고, 프론트의 영수증 필드는 T-29 안에 이미 포함돼 있다. Task 018에서 `disabled` 파일 인풋만 자리를 잡아뒀고, 실제 `POST /api/v1/uploads` 연동은 T-27이 생겨야 가능하다.
+
+- [ ] `disabled` 해제, jpg/png/webp·5MB 이하 검증, 미리보기
+- [ ] 업로드 성공 시 받은 `receiptFileId`를 제보 제출 payload에 포함
 
 ### Task 020: 내 제보 목록
 

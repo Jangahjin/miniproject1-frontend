@@ -1,21 +1,37 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-interface ReportDraftState {
+export interface ReportDraft {
+  pharmacyId: number | null;
   pharmacyName: string;
-  medicineName: string;
-  price: number | null;
+  drugId: number | null;
+  drugName: string;
+  packageUnit: string;
+  price: string;
+  purchasedAt: string;
+  memo: string;
 }
 
-const initialState: ReportDraftState = {
+const initialState: ReportDraft = {
+  pharmacyId: null,
   pharmacyName: "",
-  medicineName: "",
-  price: null,
+  drugId: null,
+  drugName: "",
+  packageUnit: "",
+  price: "",
+  purchasedAt: "",
+  memo: "",
 };
 
 const reportDraftSlice = createSlice({
   name: "reportDraft",
   initialState,
-  reducers: {},
+  reducers: {
+    setDraft: (state, action: PayloadAction<Partial<ReportDraft>>) => {
+      Object.assign(state, action.payload);
+    },
+    clearDraft: () => initialState,
+  },
 });
 
+export const { setDraft, clearDraft } = reportDraftSlice.actions;
 export default reportDraftSlice.reducer;

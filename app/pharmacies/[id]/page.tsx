@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { apiFetch, ApiError } from "@/lib/api";
 import { DistanceBadge } from "@/components/ui/DistanceBadge";
 import { PharmacyDrugPrices, type DrugPrice } from "@/components/pharmacy-drug-prices";
@@ -86,10 +87,7 @@ export default async function PharmacyDetailPage({ params, searchParams }: Pharm
         ))}
       </ul>
 
-      {/* FS-4(Task 018) 전까지는 버튼만 두고 비활성화한다 */}
-      <button type="button" disabled>
-        이 약국에 가격 제보하기
-      </button>
+      <Link href={`/reports/new?pharmacyId=${pharmacy.id}`}>이 약국에 가격 제보하기</Link>
 
       <PharmacyDrugPrices pharmacyId={pharmacy.id} drugPrices={pharmacy.drugPrices} />
     </div>
