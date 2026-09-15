@@ -110,12 +110,14 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - [x] `EmptyState.tsx`, `ErrorState.tsx`(재시도 버튼 포함, `"use client"`), `LoadingSkeleton.tsx`
 - [ ] 스타일링(Tailwind/shadcn)은 아직 안 함 — 지금은 마크업·시그니처만
 
-### Task 008: 루트 레이아웃 + 목데이터 고지 배너
+### Task 008: 루트 레이아웃 + 목데이터 고지 배너 ✅ 완료
 
-**영역**: FE | **선행**: Task 002 | **대응 공식 Task**: T-04
+**영역**: FE | **선행**: Task 002, Task 007 | **대응 공식 Task**: T-04
 
-- [ ] 헤더(로고 · 위치 표시 · 로그인) / 메인 / 푸터 레이아웃
-- [ ] 모든 페이지에 "본 서비스의 가격은 학습용 예시 데이터입니다" 고정 노출 (PRD §9)
+- [x] `app/layout.tsx`에 헤더 / 메인 / 푸터 골격 (위치 표시는 Task 010, 로그인 링크는 Task 016에서 채움)
+- [x] `components/ui/NoticeBanner.tsx` — "본 서비스의 가격은 학습용 예시 데이터입니다" (PRD §9)
+- [x] 헤더 하단 + 푸터 양쪽에 노출
+- [x] `npm run dev` 기동 후 `curl`로 렌더링된 HTML에 배너 텍스트 존재 확인
 
 ### Task 009: 상태 관리 · 폼 · 차트 라이브러리 셋업
 
