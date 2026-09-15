@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { apiFetch, ApiError } from "@/lib/api";
-import { PharmacyResultCard, type SearchResultItem } from "@/components/pharmacy-result-card";
+import type { SearchResultItem } from "@/components/pharmacy-result-card";
 import { SortToggle, RadiusFilter } from "@/components/sort-toggle";
+import { SearchResults } from "@/components/search-results";
 import { NoticeBanner } from "@/components/ui/NoticeBanner";
 
 // TODO(Task 012): 백엔드 T-15가 준비되면 API.md §5 실제 응답과 대조해 필드명을 검증한다.
@@ -90,23 +91,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       <h1>{data.drug.displayName} 검색 결과</h1>
 
       {data.summary.resultCount > 0 ? (
-        <div className="flex flex-col md:flex-row">
-          <div className="flex-1">
-            <p>
-              반경 {radius < 1000 ? `${radius}m` : `${radius / 1000}km`} 내 {data.summary.resultCount}곳
-              {data.summary.maxSaving ? ` · 최대 ${data.summary.maxSaving}원 절약 가능` : ""}
-            </p>
-            <SortToggle current={sort as "SCORE" | "PRICE" | "DISTANCE"} searchParams={currentSearchParams} />
-            <RadiusFilter current={radius} searchParams={currentSearchParams} />
-            <ul>
-              {data.results.map((item) => (
-                <PharmacyResultCard key={item.pharmacy.id} item={item} />
-              ))}
-            </ul>
-          </div>
-          {/* 지도는 Task 015(T-22)에서 채운다 */}
-          <div className="hidden md:block md:w-1/2" aria-label="지도 영역 (준비 중)" />
-        </div>
+        <>
+          <p>
+            반경 {radius < 1000 ? `${radius}m` : `${radius / 1000}km`} 내 {data.summary.resultCount}곳
+            {data.summary.maxSaving ? ` · 최대 ${data.summary.maxSaving}원 절약 가능` : ""}
+          </p>
+          <SortToggle current={sort as "SCORE" | "PRICE" | "DISTANCE"} searchParams={currentSearchParams} />
+          <RadiusFilter current={radius} searchParams={currentSearchParams} />
+          <SearchResults
+            results={data.results}
+            userLocation={lat && lng ? { lat: Number(lat), lng: Number(lng) } : null}
+          />
+        </>
       ) : (
         <div>
           <p>검색 결과가 없습니다.</p>

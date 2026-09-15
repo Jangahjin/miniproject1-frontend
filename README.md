@@ -199,15 +199,19 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - [x] 이력 0건이면 안내 메시지 표시 (코드로 분기 처리)
 - [ ] 이력 1건일 때 `LineChart`가 깨지지 않는지는 실제 데이터로 검증 못 함 — 백엔드 연동 후 확인 필요
 
-### Task 015: 카카오맵 마커 연동
+### Task 015: 카카오맵 마커 연동 ✅ 완료 (실제 지도 렌더링은 육안 미검증)
 
-**영역**: FE | **선행**: Task 012 | **대응 공식 Task**: T-22 (P1 — 일정 빠듯하면 가장 먼저 잘라내는 항목)
+**영역**: FE | **선행**: Task 012 | **대응 공식 Task**: T-22 (P1)
 
-- [ ] `next/script`(`strategy="afterInteractive"`)로 카카오맵 SDK 로드, `"use client"` 필수(서버 컴포넌트에서 SDK 접근 금지)
-- [ ] 사용자 위치(별도 아이콘) + 후보 약국 마커, 1위는 다른 색·크기, `CustomOverlay`로 가격 라벨 표시
-- [ ] 리스트 ↔ 마커 양방향 연동(hover/click 시 강조·중심 이동), `LatLngBounds`로 전체 결과가 보이게 자동 줌
-- [ ] SDK 로드 실패 시 지도 영역만 숨기고 리스트는 정상 동작 (스크립트 URL을 일부러 틀려서 확인)
-- [ ] `NEXT_PUBLIC_KAKAO_MAP_KEY` 카카오 콘솔 발급, 플랫폼 도메인에 `http://localhost:3000` 등록 필요
+> ⚠️ 이 세션엔 브라우저가 없고 백엔드도 없어서 실제 지도 렌더링(마커 위치, 가격 라벨, SDK 로딩)은 **육안으로 확인 못 함**. 타입체크·린트·빌드만 통과 상태. 실제 카카오 키를 `.env.local`에 넣고 브라우저에서 직접 확인 필요.
+
+- [x] `components/pharmacy-map.tsx` — `next/script`(`strategy="afterInteractive"`)로 SDK 로드, `"use client"`
+- [x] 사용자 위치 + 후보 약국 마커, `CustomOverlay`로 가격 라벨(1위는 파란색, 나머지는 검정)
+- [x] `components/search-results.tsx` — 리스트 hover 시 마커로 pan, 마커 클릭 시 리스트로 스크롤(`scrollIntoView`)
+- [x] `LatLngBounds`로 전체 결과가 보이게 자동 줌
+- [x] SDK `onError` 시 `sdkFailed` 상태로 지도 영역만 숨김 (실제 스크립트 실패 시나리오는 미검증)
+- [x] window.kakao 타입을 `any` 대신 실제 사용하는 API 표면만 최소 인터페이스로 선언 (eslint `no-explicit-any` 통과)
+- [ ] `NEXT_PUBLIC_KAKAO_MAP_KEY` 실제 값 발급 및 카카오 콘솔에 `http://localhost:3000` 도메인 등록 — 사용자가 직접 처리해야 함
 
 ---
 

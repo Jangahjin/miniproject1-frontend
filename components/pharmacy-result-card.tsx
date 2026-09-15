@@ -36,9 +36,17 @@ const BADGE_LABEL: Record<string, string> = {
   NEAREST: "최단거리",
 };
 
-export function PharmacyResultCard({ item }: { item: SearchResultItem }) {
+export function PharmacyResultCard({
+  item,
+  onMouseEnter,
+  listRef,
+}: {
+  item: SearchResultItem;
+  onMouseEnter?: () => void;
+  listRef?: (el: HTMLLIElement | null) => void;
+}) {
   return (
-    <li aria-current={item.recommended ? "true" : undefined}>
+    <li aria-current={item.recommended ? "true" : undefined} onMouseEnter={onMouseEnter} ref={listRef}>
       <Link href={`/pharmacies/${item.pharmacy.id}`}>{item.pharmacy.name}</Link>
       <p>{item.pharmacy.addressRoad}</p>
       <p>
