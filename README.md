@@ -35,114 +35,212 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-## 개발 Task 목록
+## 개발 Task 목록 (비공식 캐시)
 
-크라우드소싱 기반 약국별 OTC 단가 DB 구축 및 최저가 추천 시스템.
+> ⚠️ **이 목록은 공식 로드맵이 아니다.** 이 프로젝트(pharmaprice / miniProject1)의 공식 로드맵은 `D:\claude\miniProject1\docs\ROADMAP.md`(FS-슬라이스 + T-01~T-37 체계, `development-planner` 에이전트와 mcp-shrimp-task-manager가 관리)이며, 이 문서와 내용이 어긋나면 **공식 로드맵이 항상 우선**한다. 이 목록은 `miniproject1-frontend` 저장소 안에서 진행 상황을 빠르게 훑기 위한 비공식 캐시로, 각 Task마다 대응하는 공식 T-xx를 명시한다. 상세 구현 가이드·완료 판정·함정은 해당 T-xx 카드를 참고할 것 — 여기서 중복 서술하지 않는다.
 
-**진행 규칙**
-- Task는 번호 순서대로 하나씩 진행한다.
-- Task 하나를 완료하면 그 자리에서 멈추고, 사용자에게 (1) 다음 Task로 진행할지 (2) 지금까지 변경사항을 커밋할지 확인한다. 사용자 확인 없이 다음 Task로 넘어가거나 임의로 커밋하지 않는다.
-- 다음 Task로 넘어가기 전 관련 파일이 실제로 존재하는지 · 타입체크(`npx tsc --noEmit`)가 통과하는지 확인한다.
+**표기 규칙** (todo_project 컨벤션 준용)
+- Task 번호는 이 문서 전체에서 연속(`Task 001`, `Task 002` …)이며 그룹 안에서 재사용하지 않는다.
+- 상태: `✅ 완료` / `🔥 우선순위`(지금 착수) / 표기 없음(대기)
+- 각 Task는 **영역**, **선행**, **대응 공식 Task**, 구현 체크리스트를 가진다.
+- **각 Task 완료 후 관련 검증(타입체크 `npx tsc --noEmit`, 필요 시 `npm run build`)을 통과시키고, 다음 Task로 넘어가기 전에 멈춰서 사용자에게 진행/커밋 여부를 확인한다.** 사용자 확인 없이 다음 Task로 넘어가거나 임의로 커밋하지 않는다.
 
-### Phase 0 — 프로젝트 기초 세팅 (완료)
+---
 
-- [x] Next.js 16 / React 19 / TypeScript strict 초기화
-- [x] `.env.example` + `.gitignore` 예외 규칙 (`NEXT_PUBLIC_API_URL`)
-- [x] 폴더 구조 (`components/{ui,pharmacy,price}`, `lib/api`, `types`, `hooks`)
-- [x] `lib/api/client.ts` — 공통 fetch 래퍼 (`apiFetch`, `ApiError`, FormData 자동 감지)
-- [x] 도메인 타입 정의 (`types/pharmacy.ts`, `types/medicine.ts`, `types/price.ts`)
-- [x] `lib/api/price.ts` — `getRecommendations`, `submitPriceReport`
-- [x] GitHub 원격 저장소(`origin`) 연결 확인
+## 그룹 1 — 셋업 (공식 FS-0 대응)
 
-### Phase 1 — Git / 배포 준비
+### Task 001: 환경변수 템플릿 구성 ✅ 완료
 
-- [ ] Task 1.1: 지금까지 변경사항 커밋
-  - 해야 할 것: `.gitignore`, `.env.example`, `lib/`, `types/` 변경사항을 `git add`로 스테이징하고 한글 커밋 메시지로 커밋한다.
-- [ ] Task 1.2: 원격에 첫 push
-  - 해야 할 것: `git push -u origin master`로 로컬 커밋을 GitHub 원격 저장소에 올리고 브랜치 추적을 설정한다.
-- [x] Task 1.3: 배포 타겟 결정
-  - 결정: 백엔드와 같은 서버(EC2 등)에 함께 배포. Vercel 등 별도 플랫폼은 쓰지 않는다.
-- [ ] Task 1.4: 배포 타겟에 프로젝트 연결
-  - 해야 할 것: EC2에서 `next build` (standalone 출력 여부 결정 포함) 후 `next start` 또는 프로세스 매니저(pm2 등)로 구동하는 방식을 정하고, 백엔드와 포트/리버스 프록시(Nginx 등) 구성을 확인한다.
-- [ ] Task 1.5: 프로덕션 환경변수 등록
-  - 해야 할 것: `.env.example`의 키를 배포 플랫폼 대시보드에 실제 값으로 등록한다.
+**영역**: FE | **대응 공식 Task**: T-01
 
-### Phase 2 — 백엔드 연동 확정
+- [x] `.env.example`에 `NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_KAKAO_MAP_KEY` 정의 (스펙에 맞춰 `NEXT_PUBLIC_API_URL`에서 개명)
+- [x] `.gitignore`에 `.env*` 무시 + `!.env.example` 예외 규칙
 
-- [ ] Task 2.1: 백엔드 API 스펙 확인
-  - 해야 할 것: 백엔드 저장소의 API 문서/컨트롤러를 확인해 실제 엔드포인트 경로를 확정하고, `lib/api/price.ts`의 자리표시자 경로(`/api/recommendations`, `/api/price-reports`)를 교체한다.
-- [ ] Task 2.2: 인증 방식 결정
-  - 해야 할 것: 로그인/인증이 필요한지 사용자와 확정하고, 필요하다면 `apiFetch`에 토큰 주입 로직을 추가한다.
-- [ ] Task 2.3: CORS 설정 확인
-  - 해야 할 것: 백엔드 CORS 설정에 프론트엔드 origin(로컬/배포 도메인)이 허용되어 있는지 확인한다.
-- [ ] Task 2.4: 에러 응답 포맷 반영
-  - 해야 할 것: 백엔드 에러 응답 구조(에러코드 등)를 확인해 `ApiError`에 해당 필드를 추가한다.
-- [ ] Task 2.5: 목데이터/모킹 방식 결정
-  - 해야 할 것: 백엔드가 준비되지 않은 구간에서 프론트를 독립적으로 개발할 방법(MSW 등)을 결정한다.
+### Task 002: 폴더 구조 스켈레톤 ✅ 완료
 
-### Phase 3 — 가격 제보 기능
+**영역**: FE | **선행**: Task 001 | **대응 공식 Task**: T-04
 
-- [ ] Task 3.1: 가격 제보 폼 컴포넌트
-  - 해야 할 것: `components/price/PriceReportForm.tsx`를 만들어 약국명 · 약품명 · 가격 입력 필드를 구성한다.
-- [ ] Task 3.2: 영수증 이미지 첨부 필드
-  - 해야 할 것: 클라이언트 컴포넌트로 `<input type="file">`과 이미지 미리보기를 추가한다 (선택 입력).
-- [ ] Task 3.3: 폼 제출 연동
-  - 해야 할 것: 폼 제출 시 `submitPriceReport`를 호출하고 로딩 · 에러 상태를 처리한다.
-- [ ] Task 3.4: 클라이언트 유효성 검사
-  - 해야 할 것: 가격이 숫자이고 0보다 큰지, 필수 필드가 비어있지 않은지 제출 전에 검증한다.
-- [ ] Task 3.5: 제출 성공/실패 피드백 UI
-  - 해야 할 것: 토스트 또는 인라인 메시지로 제출 결과를 사용자에게 표시한다.
-- [ ] Task 3.6: 약국명 · 약품명 자동완성
-  - 해야 할 것: 백엔드의 `pg_trgm` 기반 검색 API가 준비되면 입력 필드에 자동완성을 연동한다 (Phase 2 완료 후 착수).
-- [ ] Task 3.7: 제보 완료 후 폼 초기화
-  - 해야 할 것: 제출 성공 시 폼을 초기화해 연속으로 여러 건을 제보할 수 있게 한다.
+- [x] `components/`, `lib/`, `types/`, `hooks/` 생성
+- [ ] (참고, 미처리) 저장소 폴더명이 스펙 표기(`miniProject1_frontEnd`)와 다름(`miniproject1-frontend`) — 이번 라운드에서는 리네임하지 않기로 결정함
 
-### Phase 4 — 최저가 추천 기능
+### Task 003: 공통 API 클라이언트 ✅ 완료
 
-- [ ] Task 4.1: 검색 페이지 UI
-  - 해야 할 것: 약품명을 입력받는 검색 페이지를 만든다.
-- [ ] Task 4.2: 위치 확보 로직
-  - 해야 할 것: Phase 5에서 결정된 방식으로 위도 · 경도를 확보하는 로직을 구현한다.
-- [ ] Task 4.3: 추천 결과 연동
-  - 해야 할 것: `getRecommendations`를 호출하고 `components/pharmacy/RecommendationList.tsx`에 결과를 렌더링한다.
-- [ ] Task 4.4: 로딩 · 빈 결과 · 에러 상태 UI
-  - 해야 할 것: 각 상태에 맞는 화면(스피너, "결과 없음" 안내, 에러 메시지)을 구현한다.
-- [ ] Task 4.5: 결과 정렬 옵션
-  - 해야 할 것: 가격순 · 거리순으로 정렬할 수 있는 UI를 추가한다.
-- [ ] Task 4.6: 약국 상세 정보 표시
-  - 해야 할 것: 약국 주소와 최근 가격 이력을 볼 수 있는 상세 뷰를 추가한다.
-- [ ] Task 4.7: 검색 결과 없음 안내
-  - 해야 할 것: 검색 결과가 없을 때 재검색을 유도하는 안내 문구/UI를 추가한다.
+**영역**: FE | **선행**: Task 001 | **대응 공식 Task**: T-04
 
-### Phase 5 — 지도 / 위치 (미정)
+- [x] `lib/api.ts` 단일 파일로 통합 (`lib/api/client.ts` + `lib/api/price.ts` 분리 구조 폐기)
+- [x] `ApiError(status, code, message, fieldErrors?, traceId?)` — API.md §1.2 에러 바디 형식 반영
+- [x] `204 No Content` → `undefined` 반환, JSON 파싱 실패 시에도 `ApiError`로 던짐
+- [x] `FormData` 자동 감지 시 `Content-Type` 강제 안 함
+- [ ] `auth` 옵션은 시그니처만 고정, 실제 토큰 주입은 Task 019(T-25)에서
 
-- [ ] Task 5.1: 지도 방식 결정
-  - 해야 할 것: 카카오맵 API 도입 여부를 사용자와 최종 확정한다.
-- [ ] Task 5.2: 관련 키 추가
-  - 해야 할 것: 결정된 방식에 필요한 API 키를 `.env.example`에 추가한다.
-- [ ] Task 5.3: 위치 권한 UX
-  - 해야 할 것: 위치 권한 요청 흐름과, 거부됐을 때의 대체 입력 방식(수동 주소 입력 등)을 구현한다.
-- [ ] Task 5.4: 지도 마커 표시 (카카오맵 채택 시)
-  - 해야 할 것: 추천 결과의 약국 위치를 지도 위에 마커로 표시한다.
+### Task 004: 배포 관련 설정 원복 ✅ 완료
 
-### Phase 6 — 품질 / 테스트
+**영역**: FE | **대응 근거**: PRD.md §2.2 비목표, §8, §11
 
-- [ ] Task 6.1: 테스트 프레임워크 결정
-  - 해야 할 것: Vitest, Playwright 등 도입 여부와 범위를 사용자와 확정한다.
-- [ ] Task 6.2: 가격 제보 폼 단위 테스트
-  - 해야 할 것: 폼 유효성 검사와 제출 로직에 대한 테스트를 작성한다.
-- [ ] Task 6.3: 추천 로직 단위 테스트
-  - 해야 할 것: 정렬 · 필터링 등 추천 관련 로직에 대한 테스트를 작성한다.
-- [ ] Task 6.4: 포맷터 도입 결정
-  - 해야 할 것: Prettier 등 포맷터 도입 여부를 확정하고, 도입 시 설정 파일을 추가한다.
-- [ ] Task 6.5: 반응형 레이아웃 점검
-  - 해야 할 것: 모바일 화면 폭 기준으로 주요 페이지 레이아웃을 점검하고 수정한다.
-- [ ] Task 6.6: 접근성 점검
-  - 해야 할 것: 폼 라벨 연결, 키보드만으로 조작 가능한지 등을 점검한다.
+> PRD가 "프로덕션 클라우드 배포·컨테이너화는 범위 밖, 로컬 직접 실행까지만 다룬다(Docker 미사용)"고 명시한 걸 뒤늦게 확인. 이전에 진행했던 EC2 배포 결정과 `next.config.ts`의 `output: "standalone"` 설정은 스펙 밖이라 되돌림.
 
-### Phase 7 — 마무리
+- [x] `next.config.ts`의 `output: "standalone"` 제거
+- [x] 이전 EC2 배포 결정 무효화 (이 프로젝트는 배포하지 않는다)
 
-- [ ] Task 7.1: 데모 링크 · 스크린샷 추가
-  - 해야 할 것: 배포 완료 후 README에 실제 서비스 링크와 스크린샷을 추가한다.
-- [ ] Task 7.2: 알려진 제약사항 정리
-  - 해야 할 것: 목데이터 비중, 지도 미도입 여부 등 미니프로젝트 범위의 한계를 README에 명시한다.
+### Task 005: Git 커밋 및 원격 push ✅ 완료
+
+**영역**: 공통 | **선행**: Task 001~003 | **대응 공식 Task**: T-01(Git 저장소 구성)
+
+- [x] `.gitignore`, `.env.example`, `lib/`, `types/`, `README.md` 커밋 (`6b49318`, `5af7715`)
+- [x] `git push -u origin master`로 `origin` 원격에 push, 브랜치 추적 설정
+
+### Task 006: openapi-typescript 타입 생성 파이프라인
+
+**영역**: FE | **선행**: 백엔드 T-03(Swagger UI 노출) | **대응 공식 Task**: T-04
+
+- [ ] `openapi-typescript`를 devDependency로 추가
+- [ ] `package.json`에 `gen:api` 스크립트 추가 (`/v3/api-docs` → `types/api.ts`)
+- [ ] 수기 타입 정의 금지 원칙 확인 — 이전에 만들었던 `types/{pharmacy,medicine,price}.ts`는 이미 삭제함
+
+**메모**: 백엔드가 아직 없어 지금은 실행 불가. 백엔드가 T-03까지 진행되어 `/swagger-ui.html`이 열리는 시점에 착수.
+
+### Task 007: 공통 컴포넌트 & 포맷 유틸
+
+**영역**: FE | **선행**: Task 002 | **대응 공식 Task**: T-04
+
+- [ ] `PriceTag`(천단위 콤마), `DistanceBadge`(1000m 기준 단위 전환)
+- [ ] `EmptyState`, `ErrorState`(재시도 버튼 포함), `LoadingSkeleton`
+- [ ] `lib/format.ts` — `formatPrice`, `formatDistance`, `formatRelativeDate`
+
+### Task 008: 루트 레이아웃 + 목데이터 고지 배너
+
+**영역**: FE | **선행**: Task 002 | **대응 공식 Task**: T-04
+
+- [ ] 헤더(로고 · 위치 표시 · 로그인) / 메인 / 푸터 레이아웃
+- [ ] 모든 페이지에 "본 서비스의 가격은 학습용 예시 데이터입니다" 고정 노출 (PRD §9)
+
+### Task 009: 상태 관리 · 폼 · 차트 라이브러리 셋업
+
+**영역**: FE | **선행**: Task 002 | **대응 공식 Task**: T-04
+
+- [ ] TanStack Query, Redux Toolkit, React Hook Form + Zod, Recharts 설치
+- [ ] `app/providers.tsx`(QueryClientProvider), `store/slices/`(locationSlice, authSlice, reportDraftSlice) 골격 생성
+- [ ] 검색 결과는 서버 컴포넌트 SSR + URL 쿼리로 유지 — TanStack Query로 옮기지 않는다 (development-planner 프론트 경계 규칙)
+
+---
+
+## 그룹 2 — 최저가 검색 (공식 FS-2 대응, 핵심 슬라이스)
+
+### Task 010: 검색 홈 UI
+
+**영역**: FE | **선행**: Task 008 | **대응 공식 Task**: T-16
+
+- [ ] 약품 검색창, 위치 표시/재설정, 인기 약품 칩
+
+### Task 011: 약품 자동완성
+
+**영역**: FE | **선행**: Task 009, Task 010 | **대응 공식 Task**: T-17
+
+- [ ] TanStack Query로 `GET /api/v1/drugs?q=` 연동한 자동완성
+
+### Task 012: 검색 결과 화면
+
+**영역**: FE | **선행**: Task 011 | **대응 공식 Task**: T-18
+
+- [ ] `/search?drugId=&lat=&lng=&radius=` — 서버 컴포넌트 SSR + URL 쿼리
+- [ ] 정렬 토글(가격순/거리순), 반경 필터, 결과 0건 시 반경 확대 제안
+
+---
+
+## 그룹 3 — 약국 상세 (공식 FS-3 대응)
+
+### Task 013: 약국 상세 페이지
+
+**영역**: FE | **선행**: Task 012 | **대응 공식 Task**: T-19
+
+- [ ] 약국 정보, 취급 약품별 대표가격 표, "가격 제보하기" 버튼
+
+### Task 014: 가격 이력 차트
+
+**영역**: FE | **선행**: Task 009, Task 013 | **대응 공식 Task**: T-20, T-21 (P1)
+
+- [ ] Recharts 스파크라인, TanStack Query로 이력 fetch
+
+### Task 015: 카카오맵 마커 연동
+
+**영역**: FE | **선행**: Task 012 | **대응 공식 Task**: T-22 (P1 — 일정 빠듯하면 가장 먼저 잘라내는 항목)
+
+- [ ] 후보 약국 마커 표시, 리스트-마커 상호 연동
+- [ ] `NEXT_PUBLIC_KAKAO_MAP_KEY` 카카오 콘솔 발급 (허용 도메인 `localhost` 제한)
+
+---
+
+## 그룹 4 — 인증 + 제보 (공식 FS-4 대응)
+
+### Task 016: 로그인 / 회원가입 화면
+
+**영역**: FE | **선행**: Task 009 | **대응 공식 Task**: T-24 프론트 파트
+
+- [ ] 이메일/비밀번호 로그인·회원가입 폼
+
+### Task 017: 인증 상태 관리 (authSlice)
+
+**영역**: FE | **선행**: Task 016 | **대응 공식 Task**: T-25
+
+- [ ] `authSlice`(Redux Toolkit)로 세션 상태 관리
+- [ ] `lib/api.ts`의 `auth: true` 옵션에 실제 토큰 주입 연결
+
+### Task 018: 가격 제보 폼
+
+**영역**: FE | **선행**: Task 017 | **대응 공식 Task**: T-26, T-29
+
+- [ ] 약국 선택(검색/지도) → 약품 선택(자동완성) → 가격 → 구매일
+- [ ] `reportDraftSlice`(Redux Toolkit)로 임시 입력 보존 (비로그인 시 로그인 페이지 리다이렉트 후 복원)
+- [ ] 가격 100~200,000원 정수 검증 (React Hook Form + Zod)
+
+### Task 019: 영수증 업로드
+
+**영역**: FE | **선행**: Task 018 | **대응 공식 Task**: T-27 (P1 — 일정 빠듯하면 잘라낼 항목)
+
+- [ ] jpg/png/webp, 5MB 이하 첨부 필드, 미리보기 (필수 아님, OCR 없음)
+
+### Task 020: 내 제보 목록
+
+**영역**: FE | **선행**: Task 018 | **대응 공식 Task**: T-30 (P1 — 일정 빠듯하면 잘라낼 항목)
+
+- [ ] `/me` — 내가 올린 제보 목록과 상태 표시
+
+---
+
+## 그룹 5 — 관리자 (공식 FS-5 대응, P2)
+
+### Task 021: 관리자 대시보드 · 통계
+
+**영역**: FE | **선행**: Task 017 | **대응 공식 Task**: T-31~T-33 (P2 — 일정 빠듯하면 가장 먼저 통째로 잘라내는 그룹)
+
+- [ ] 요약 지표, 지역별·약품별 통계 테이블/차트 (TanStack Query)
+
+### Task 022: 이상치 제보 관리
+
+**영역**: FE | **선행**: Task 021 | **대응 공식 Task**: T-34 (P2)
+
+- [ ] `flagged=true` 제보 목록, 숨김/복구 처리
+
+---
+
+## 그룹 6 — 마감 (공식 FS-6 대응)
+
+### Task 023: 예외 처리 · 에러 바운더리
+
+**영역**: FE | **대응 공식 Task**: T-35
+
+- [ ] `ApiError` 기반 공통 에러 처리, 사용자 메시지 매핑
+
+### Task 024: 반응형 점검
+
+**영역**: FE | **대응 공식 Task**: T-36
+
+- [ ] 모바일 우선 — 지도 상단 40vh + 리스트 바텀시트 구조
+- [ ] 375px 폭에서 레이아웃 깨짐 없는지 확인
+
+### Task 025: 수동 완주 체크리스트
+
+**영역**: 공통 | **대응 공식 Task**: T-37
+
+- [ ] 검색 → 결과 → 상세 → 제보 → 재검색 흐름 무중단 확인
+- [ ] 클린 클론 상태에서 README 절차만으로 재현 가능한지 확인
