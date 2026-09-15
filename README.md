@@ -119,13 +119,14 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - [x] 헤더 하단 + 푸터 양쪽에 노출
 - [x] `npm run dev` 기동 후 `curl`로 렌더링된 HTML에 배너 텍스트 존재 확인
 
-### Task 009: 상태 관리 · 폼 · 차트 라이브러리 셋업
+### Task 009: 상태 관리 · 폼 · 차트 라이브러리 셋업 ✅ 완료
 
-**영역**: FE | **선행**: Task 002 | **대응 공식 Task**: T-04
+**영역**: FE | **선행**: Task 002, Task 008 | **대응 공식 Task**: T-04
 
-- [ ] TanStack Query, Redux Toolkit, React Hook Form + Zod, Recharts 설치
-- [ ] `app/providers.tsx`(QueryClientProvider), `store/slices/`(locationSlice, authSlice, reportDraftSlice) 골격 생성
-- [ ] 검색 결과는 서버 컴포넌트 SSR + URL 쿼리로 유지 — TanStack Query로 옮기지 않는다 (development-planner 프론트 경계 규칙)
+- [x] TanStack Query, Redux Toolkit, React Hook Form + Zod, Recharts 설치
+- [x] `app/providers.tsx` — `QueryClientProvider` + Redux `Provider`, `layout.tsx`에 연결
+- [x] `store/index.ts` + `store/slices/{location,auth,report-draft}-slice.ts` 골격 (reducers는 비워둠 — Task 010/017/018에서 채움)
+- [ ] 검색 결과는 서버 컴포넌트 SSR + URL 쿼리로 유지 — TanStack Query로 옮기지 않는다 (development-planner 프론트 경계 규칙, Task 012에서 지킬 것)
 
 ---
 

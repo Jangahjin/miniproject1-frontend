@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NoticeBanner } from "@/components/ui/NoticeBanner";
+import { Providers } from "./providers";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,15 +26,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <header>
-          <span>약값알림</span>
-          {/* 위치 표시는 Task 010, 로그인 링크는 Task 016에서 채운다 */}
-          <NoticeBanner />
-        </header>
-        <main className="flex flex-col flex-1">{children}</main>
-        <footer>
-          <NoticeBanner />
-        </footer>
+        <Providers>
+          <header>
+            <span>약값알림</span>
+            {/* 위치 표시는 Task 010, 로그인 링크는 Task 016에서 채운다 */}
+            <NoticeBanner />
+          </header>
+          <main className="flex flex-col flex-1">{children}</main>
+          <footer>
+            <NoticeBanner />
+          </footer>
+        </Providers>
       </body>
     </html>
   );
