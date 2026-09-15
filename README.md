@@ -157,12 +157,20 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - [x] 선택 시 `/search?drugId={id}&lat=&lng=&radius=2000`으로 이동, 위치 `idle`이면 Task 010의 `requestLocation` 먼저 호출
 - [x] `app/page.tsx`를 create-next-app 기본 템플릿에서 실제 홈 화면으로 교체, `npm run dev`로 렌더링 확인
 
-### Task 012: 검색 결과 화면
+### Task 012: 검색 결과 화면 ✅ 완료 (백엔드 의존 부분 제외)
 
 **영역**: FE | **선행**: Task 011 | **대응 공식 Task**: T-18
 
-- [ ] `/search?drugId=&lat=&lng=&radius=` — 서버 컴포넌트 SSR + URL 쿼리
-- [ ] 정렬 토글(가격순/거리순), 반경 필터, 결과 0건 시 반경 확대 제안
+> ⚠️ T-15(`GET /api/v1/search`)가 없어 실제 검색 동작은 검증 못 함. 다만 응답 구조는 API.md §5 예시 JSON을 그대로 읽고 만들어서(추정 아님) `SearchResultItem`/`SearchResponse` 필드가 실제 스펙과 일치한다.
+
+- [x] `app/search/page.tsx` — 서버 컴포넌트로 `GET /api/v1/search` 호출(SSR), `drugId`+(`lat`+`lng` 또는 `regionCode`) 필수 검증
+- [x] `radius`(500/1000/2000/5000, 기본 2000), `sort`(SCORE/PRICE/DISTANCE, 기본 SCORE) 값 검증 및 기본값 처리
+- [x] `components/pharmacy-result-card.tsx` — 대표가격/최저가, 거리, 제보 수, 갱신일, 절약액, 뱃지(`LOWEST_PRICE`/`LOW_CONFIDENCE`/`STALE_DATA`) 표시
+- [x] `components/sort-toggle.tsx` — `SortToggle`(정렬), `RadiusFilter`(반경) — `<Link>` 기반 URL 쿼리 변경(뒤로가기 자동 지원)
+- [x] 결과 0건 시 `suggestion.recommendedRadius`로 반경 확대 링크 제공
+- [x] `dataSource`가 `SEED`/`MIXED`면 결과 상단에 고지 배너 추가 노출
+- [x] 파라미터 누락 / API 에러 시 크래시 없이 안내 메시지 표시 — `curl`로 두 경우 모두 확인
+- [ ] 지도 영역(우측, T-22)은 아직 자리만 비워둠 — Task 015에서 채움
 
 ---
 
