@@ -60,10 +60,10 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
   - 해야 할 것: `.gitignore`, `.env.example`, `lib/`, `types/` 변경사항을 `git add`로 스테이징하고 한글 커밋 메시지로 커밋한다.
 - [ ] Task 1.2: 원격에 첫 push
   - 해야 할 것: `git push -u origin master`로 로컬 커밋을 GitHub 원격 저장소에 올리고 브랜치 추적을 설정한다.
-- [ ] Task 1.3: 배포 타겟 결정
-  - 해야 할 것: Vercel 등 배포 플랫폼을 사용자와 상의해 확정한다.
+- [x] Task 1.3: 배포 타겟 결정
+  - 결정: 백엔드와 같은 서버(EC2 등)에 함께 배포. Vercel 등 별도 플랫폼은 쓰지 않는다.
 - [ ] Task 1.4: 배포 타겟에 프로젝트 연결
-  - 해야 할 것: 확정된 플랫폼에 저장소를 연결하고 빌드 명령(`npm run build`)이 정상 동작하는지 확인한다.
+  - 해야 할 것: EC2에서 `next build` (standalone 출력 여부 결정 포함) 후 `next start` 또는 프로세스 매니저(pm2 등)로 구동하는 방식을 정하고, 백엔드와 포트/리버스 프록시(Nginx 등) 구성을 확인한다.
 - [ ] Task 1.5: 프로덕션 환경변수 등록
   - 해야 할 것: `.env.example`의 키를 배포 플랫폼 대시보드에 실제 값으로 등록한다.
 
