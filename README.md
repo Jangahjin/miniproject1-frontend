@@ -217,18 +217,29 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## 그룹 4 — 인증 + 제보 (공식 FS-4 대응)
 
-### Task 016: 로그인 / 회원가입 화면
+### Task 016: 로그인 / 회원가입 화면 ✅ 완료 (백엔드 의존 부분 제외)
 
-**영역**: FE | **선행**: Task 009 | **대응 공식 Task**: T-24 프론트 파트
+**영역**: FE | **선행**: Task 009 | **대응 공식 Task**: T-25 (⚠️ 이전에 T-24로 잘못 매핑했었음 — T-24는 백엔드 전용 인증 API)
 
-- [ ] 이메일/비밀번호 로그인·회원가입 폼
+> ⚠️ T-23/T-24(백엔드)가 없어 실제 가입·로그인은 검증 못 함. `curl`로 라우트 핸들러가 500을 정상 반환하고 서버가 죽지 않는 것만 확인.
 
-### Task 017: 인증 상태 관리 (authSlice)
+- [x] `app/(auth)/login/page.tsx`, `app/(auth)/signup/page.tsx` — React Hook Form + Zod 클라이언트 검증 (API.md §2 규칙과 동일: 비밀번호 8~64자 영문+숫자, 닉네임 2~30자)
+- [x] `useSearchParams()`를 쓰는 로그인 폼은 `Suspense`로 감싸야 정적 프리렌더가 통과함 (빌드 에러로 발견)
+
+### Task 017: 인증 상태 관리 및 세션 유지 ✅ 완료 (백엔드 의존 부분 제외)
 
 **영역**: FE | **선행**: Task 016 | **대응 공식 Task**: T-25
 
-- [ ] `authSlice`(Redux Toolkit)로 세션 상태 관리
-- [ ] `lib/api.ts`의 `auth: true` 옵션에 실제 토큰 주입 연결
+> ⚠️ 아래 항목 중 실제 토큰 발급·검증이 필요한 부분은 백엔드 없이 코드만 작성했고 end-to-end 검증은 못 함.
+
+- [x] `store/slices/auth-slice.ts` — `login`/`logout` thunk, `setSession`/`clearSession`, `accessToken`은 Redux 메모리에만 보관 (localStorage 사용 안 함)
+- [x] `lib/auth-cookie.ts` + `app/api/auth/{login,signup,refresh,logout}/route.ts` — refreshToken은 Next Route Handler가 httpOnly 쿠키로만 다루고 클라이언트 JS에 노출 안 됨. `/auth/refresh`는 토큰 회전(rotation) 반영
+- [x] `lib/api.ts`에 401 인터셉터 추가 — `auth:true` 호출이 401이면 `/api/auth/refresh` 1회 시도 후 재요청, 무한 루프 방지용 `isRetry` 플래그
+- [x] `components/auth-bootstrap.tsx` — 새로고침 시 `accessToken`이 없으면 refreshToken 쿠키로 세션 자동 복원 시도
+- [x] `components/auth-status.tsx` — 헤더에 닉네임/로그아웃 또는 로그인 링크 표시
+- [x] `middleware.ts` — `/reports/new`, `/me`, `/admin/*`를 refreshToken 쿠키 존재 여부로 보호, `?next=`로 복귀 경로 전달 (`curl`로 307 리다이렉트 확인)
+- [ ] "가입→로그인→헤더 표시→로그아웃", "만료 후 자동 갱신", "새로고침해도 유지" — 전부 실제 백엔드 필요, 미검증
+- **메모**: `lib/api.ts`가 `@/store`를 동적 import — Node 서버 프로세스에서 모듈이 프로세스 전역에 캐시되는 특성상 서버 컴포넌트 컨텍스트에서는 요청 간 상태 공유가 이론상 가능하나, `auth:true` 호출은 전부 클라이언트 컴포넌트에서만 발생하므로 이 스코프에서는 문제 없음
 
 ### Task 018: 가격 제보 폼
 

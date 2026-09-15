@@ -17,18 +17,35 @@ export async function apiFetch<T>(
   path: string,
   options?: RequestInit & { auth?: boolean }
 ): Promise<T> {
-  // auth 토큰 주입은 T-25(인증)에서 구현한다. 지금은 시그니처만 고정해둔다.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return apiFetchInternal<T>(path, options, false);
+}
+
+async function apiFetchInternal<T>(
+  path: string,
+  options: (RequestInit & { auth?: boolean }) | undefined,
+  isRetry: boolean
+): Promise<T> {
   const { auth, ...init } = options ?? {};
   const isFormData = init.body instanceof FormData;
 
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers: {
-      ...(isFormData ? {} : { "Content-Type": "application/json" }),
-      ...init.headers,
-    },
-  });
+  const headers: Record<string, string> = {
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
+    ...(init.headers as Record<string, string> | undefined),
+  };
+
+  if (auth) {
+    // 동적 import로 서버 컴포넌트(인증 불필요한 SSR 호출)에서 Redux 스토어를 끌어오지 않게 한다.
+    const { store } = await import("@/store");
+    const token = store.getState().auth.accessToken;
+    if (token) headers.Authorization = `Bearer ${token}`;
+  }
+
+  const res = await fetch(`${API_BASE_URL}${path}`, { ...init, headers });
+
+  if (res.status === 401 && auth && !isRetry) {
+    const refreshed = await tryRefreshAccessToken();
+    if (refreshed) return apiFetchInternal<T>(path, options, true);
+  }
 
   if (!res.ok) {
     try {
@@ -46,4 +63,18 @@ export async function apiFetch<T>(
   }
 
   return res.json() as Promise<T>;
+}
+
+async function tryRefreshAccessToken(): Promise<boolean> {
+  try {
+    const res = await fetch("/api/auth/refresh", { method: "POST" });
+    if (!res.ok) return false;
+    const data = await res.json();
+    const { store } = await import("@/store");
+    const { setSession } = await import("@/store/slices/auth-slice");
+    store.dispatch(setSession({ accessToken: data.accessToken, user: data.user }));
+    return true;
+  } catch {
+    return false;
+  }
 }

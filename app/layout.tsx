@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NoticeBanner } from "@/components/ui/NoticeBanner";
 import { LocationIndicator } from "@/components/location-indicator";
+import { AuthStatus } from "@/components/auth-status";
 import { Providers } from "./providers";
 import "./globals.css";
 
@@ -31,7 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <header>
             <span>약값알림</span>
             <LocationIndicator />
-            {/* 로그인 링크는 Task 016에서 채운다 */}
+            <AuthStatus />
             <NoticeBanner />
           </header>
           <main className="flex flex-col flex-1">{children}</main>
