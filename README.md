@@ -178,22 +178,29 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ### Task 013: 약국 상세 페이지
 
-**영역**: FE | **선행**: Task 012 | **대응 공식 Task**: T-19
+**영역**: FE | **선행**: Task 012 | **대응 공식 Task**: T-21 (⚠️ 이전에 T-19로 잘못 매핑했었음 — T-19는 백엔드 전용 API 태스크)
 
-- [ ] 약국 정보, 취급 약품별 대표가격 표, "가격 제보하기" 버튼
+> T-19(백엔드, 약국 상세 API)가 있어야 실제 데이터 연동 가능. 지금은 UI만 작성 가능.
+
+- [ ] `app/pharmacies/[id]/page.tsx` — 약국 정보(주소·전화 `tel:`·영업시간·거리), `drugPrices` 표(가격 오름차순, 전국 평균 대비 색상), "가격 제보하기" 버튼(FS-4 전까지 비활성)
 
 ### Task 014: 가격 이력 차트
 
-**영역**: FE | **선행**: Task 009, Task 013 | **대응 공식 Task**: T-20, T-21 (P1)
+**영역**: FE | **선행**: Task 009, Task 013 | **대응 공식 Task**: T-21 (⚠️ 이전에 "T-20, T-21"로 잘못 적었음 — T-20은 백엔드 전용 API, 프론트 파트는 T-21 하나)
 
-- [ ] Recharts 스파크라인, TanStack Query로 이력 fetch
+> T-20(백엔드, 가격 이력 API)이 있어야 실제 데이터 연동 가능.
+
+- [ ] `components/price-history-chart.tsx` — Recharts 스파크라인, TanStack Query로 이력 fetch, `flagged:true` 점은 회색 점선+툴팁, 이력 1건이어도 안 깨지게
 
 ### Task 015: 카카오맵 마커 연동
 
 **영역**: FE | **선행**: Task 012 | **대응 공식 Task**: T-22 (P1 — 일정 빠듯하면 가장 먼저 잘라내는 항목)
 
-- [ ] 후보 약국 마커 표시, 리스트-마커 상호 연동
-- [ ] `NEXT_PUBLIC_KAKAO_MAP_KEY` 카카오 콘솔 발급 (허용 도메인 `localhost` 제한)
+- [ ] `next/script`(`strategy="afterInteractive"`)로 카카오맵 SDK 로드, `"use client"` 필수(서버 컴포넌트에서 SDK 접근 금지)
+- [ ] 사용자 위치(별도 아이콘) + 후보 약국 마커, 1위는 다른 색·크기, `CustomOverlay`로 가격 라벨 표시
+- [ ] 리스트 ↔ 마커 양방향 연동(hover/click 시 강조·중심 이동), `LatLngBounds`로 전체 결과가 보이게 자동 줌
+- [ ] SDK 로드 실패 시 지도 영역만 숨기고 리스트는 정상 동작 (스크립트 URL을 일부러 틀려서 확인)
+- [ ] `NEXT_PUBLIC_KAKAO_MAP_KEY` 카카오 콘솔 발급, 플랫폼 도메인에 `http://localhost:3000` 등록 필요
 
 ---
 
