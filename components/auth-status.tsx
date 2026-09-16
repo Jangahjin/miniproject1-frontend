@@ -19,6 +19,11 @@ export function AuthStatus() {
 
   return (
     <span className="flex items-center gap-2">
+      {user.role === "ADMIN" && (
+        <Link href="/admin" className="font-medium text-gray-500 hover:text-gray-700 hover:underline">
+          관리자
+        </Link>
+      )}
       <Link href="/me" className="hover:underline">
         {user.nickname}님
       </Link>
