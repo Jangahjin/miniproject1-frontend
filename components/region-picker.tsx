@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 
-// TODO(Task 010): 백엔드 T-14가 준비되면 API.md §7 실제 응답과 대조해 필드명을 검증한다.
-interface RegionDistrict {
+// docs/API.md §7 (T-14) 실제 응답 형태와 맞춰뒀다.
+interface Sigungu {
   code: string;
-  name: string;
+  sigungu: string;
   centerLat: number;
   centerLng: number;
   pharmacyCount: number;
@@ -14,7 +14,7 @@ interface RegionDistrict {
 
 interface RegionGroup {
   sido: string;
-  districts: RegionDistrict[];
+  sigungus: Sigungu[];
 }
 
 export function RegionPicker({
@@ -43,15 +43,15 @@ export function RegionPicker({
         <div key={group.sido} className="mb-2">
           <p className="mb-1 text-xs font-semibold text-gray-500">{group.sido}</p>
           <div className="flex flex-wrap gap-1">
-            {group.districts.map((district) => (
+            {group.sigungus.map((sigungu) => (
               <button
-                key={district.code}
+                key={sigungu.code}
                 type="button"
-                disabled={district.pharmacyCount === 0}
-                onClick={() => onSelect(district.code, district.centerLat, district.centerLng)}
+                disabled={sigungu.pharmacyCount === 0}
+                onClick={() => onSelect(sigungu.code, sigungu.centerLat, sigungu.centerLng)}
                 className="rounded-full border border-gray-200 px-2 py-1 text-xs text-gray-700 hover:border-blue-400 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {district.name}
+                {sigungu.sigungu}
               </button>
             ))}
           </div>
