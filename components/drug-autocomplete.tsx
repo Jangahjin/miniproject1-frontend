@@ -46,7 +46,7 @@ export function DrugAutocomplete({
   }
 
   return (
-    <div>
+    <div className="relative">
       <input
         role="combobox"
         aria-expanded={results.length > 0}
@@ -59,22 +59,36 @@ export function DrugAutocomplete({
         }}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
+        className="w-full rounded-xl border border-gray-300 px-4 py-3 text-base shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
       />
-      {isFetching && <span>검색 중...</span>}
+      {isFetching && (
+        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+          검색 중...
+        </span>
+      )}
 
-      <ul id={listboxId} role="listbox">
-        {results.map((drug, index) => (
-          <li
-            key={drug.id}
-            id={`drug-option-${index}`}
-            role="option"
-            aria-selected={index === activeIndex}
-            onClick={() => selectDrug(drug)}
-          >
-            {drug.displayName} ({drug.packageUnit})
-          </li>
-        ))}
-      </ul>
+      {results.length > 0 && (
+        <ul
+          id={listboxId}
+          role="listbox"
+          className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white text-left shadow-lg"
+        >
+          {results.map((drug, index) => (
+            <li
+              key={drug.id}
+              id={`drug-option-${index}`}
+              role="option"
+              aria-selected={index === activeIndex}
+              onClick={() => selectDrug(drug)}
+              className={`cursor-pointer px-4 py-2 text-sm hover:bg-blue-50 ${
+                index === activeIndex ? "bg-blue-50" : ""
+              }`}
+            >
+              {drug.displayName} ({drug.packageUnit})
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

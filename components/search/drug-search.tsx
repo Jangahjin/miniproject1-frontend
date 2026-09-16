@@ -24,12 +24,17 @@ export function DrugSearch() {
   }
 
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       <DrugAutocomplete value={query} onChange={setQuery} onSelect={handleSelect} />
 
-      <div>
+      <div className="flex flex-wrap justify-center gap-2">
         {POPULAR_DRUGS.map((name) => (
-          <button key={name} type="button" onClick={() => setQuery(name)}>
+          <button
+            key={name}
+            type="button"
+            onClick={() => setQuery(name)}
+            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700 hover:border-blue-400 hover:text-blue-600"
+          >
             {name}
           </button>
         ))}

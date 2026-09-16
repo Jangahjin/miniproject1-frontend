@@ -27,16 +27,22 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ko"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-gray-50 text-gray-900">
         <Providers>
-          <header>
-            <span>약값알림</span>
-            <LocationIndicator />
-            <AuthStatus />
+          <header className="sticky top-0 z-10 border-b border-gray-200 bg-white">
+            <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-3 px-4 py-3">
+              <span className="text-lg font-bold text-blue-600">약값알림</span>
+              <div className="ml-auto flex items-center gap-4 text-sm text-gray-600">
+                <LocationIndicator />
+                <AuthStatus />
+              </div>
+            </div>
             <NoticeBanner />
           </header>
-          <main className="flex flex-col flex-1">{children}</main>
-          <footer>
+          <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 py-8">
+            {children}
+          </main>
+          <footer className="border-t border-gray-200 bg-white">
             <NoticeBanner />
           </footer>
         </Providers>

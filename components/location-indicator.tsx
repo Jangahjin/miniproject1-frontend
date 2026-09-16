@@ -18,11 +18,15 @@ export function LocationIndicator() {
   const showRegionPicker = location.status === "denied" || location.status === "unavailable";
 
   return (
-    <>
-      <button type="button" onClick={requestLocation}>
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        onClick={requestLocation}
+        className="rounded-full border border-gray-300 px-3 py-1 text-xs text-gray-600 hover:border-blue-400 hover:text-blue-600"
+      >
         {label}
       </button>
       {showRegionPicker && <RegionPicker onSelect={selectRegion} />}
-    </>
+    </div>
   );
 }
