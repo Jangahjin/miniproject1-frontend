@@ -119,7 +119,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       ) : (
         <div className="flex flex-col items-center gap-3 py-16 text-center">
           <p className="text-gray-500">검색 결과가 없습니다.</p>
-          {data.suggestion?.type === "EXPAND_RADIUS" && (
+          {data.suggestion?.type === "EXPAND_RADIUS" ? (
             <Link
               href={buildExpandedRadiusHref(currentSearchParams, data.suggestion.recommendedRadius)}
               className="font-medium text-blue-600 hover:underline"
@@ -127,6 +127,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               반경을 {data.suggestion.recommendedRadius / 1000}km로 넓히면{" "}
               {data.suggestion.estimatedCount}곳이 있습니다
             </Link>
+          ) : (
+            <p className="text-sm text-gray-400">
+              최대 반경(5km)까지 넓혀도 등록된 약국이 없습니다. 다른 지역에서 검색해보세요.
+            </p>
           )}
         </div>
       )}
