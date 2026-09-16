@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NoticeBanner } from "@/components/ui/NoticeBanner";
 import { LocationIndicator } from "@/components/location-indicator";
@@ -31,7 +32,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Providers>
           <header className="sticky top-0 z-10 border-b border-gray-200 bg-white">
             <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-3 px-4 py-3">
-              <span className="text-lg font-bold text-blue-600">약값알림</span>
+              <Link href="/" className="text-lg font-bold text-blue-600 hover:text-blue-700">
+                약값알림
+              </Link>
               <div className="ml-auto flex items-center gap-4 text-sm text-gray-600">
                 <LocationIndicator />
                 <AuthStatus />
