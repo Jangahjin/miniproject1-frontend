@@ -88,6 +88,12 @@ function ReportForm() {
   }, [receiptPreviewUrl]);
 
   function handlePriceChange(raw: string) {
+    // 콤마는 formatPriceDisplay가 넣은 표시용 문자라 무시하지만, 마이너스 부호는
+    // 조용히 지워서 "-100"이 "100"으로 둔갑하게 두지 않는다 — 바로 에러로 알린다.
+    if (raw.includes("-")) {
+      setPriceError("가격은 음수로 입력할 수 없습니다.");
+      return;
+    }
     const digits = raw.replace(/[^\d]/g, "").slice(0, 6);
     updateDraft({ price: digits });
     setPriceError(null);
