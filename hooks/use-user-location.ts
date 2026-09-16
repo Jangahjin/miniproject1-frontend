@@ -41,34 +41,40 @@ export function useUserLocation() {
     }
   }, []);
 
-  const requestLocation = useCallback(() => {
+  // GPS 응답은 비동기라, 호출 직후 리렌더 전의 location(클로저)을 읽으면 여전히
+  // 이전 상태다. 좌표가 필요한 호출부는 반환된 Promise 결과를 직접 써야 한다.
+  const requestLocation = useCallback((): Promise<{ lat: number; lng: number } | null> => {
     dispatch(requesting());
 
     if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
       dispatch(unavailable());
-      return;
+      return Promise.resolve(null);
     }
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const next: LocationState = {
-          status: "granted",
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-          source: "GPS",
-        };
-        dispatch(granted({ lat: next.lat, lng: next.lng }));
-        persist(next);
-      },
-      (error) => {
-        if (error.code === error.PERMISSION_DENIED) {
-          dispatch(denied());
-        } else {
-          dispatch(unavailable());
-        }
-      },
-      { enableHighAccuracy: false, timeout: 8000 }
-    );
+    return new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const next: LocationState = {
+            status: "granted",
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            source: "GPS",
+          };
+          dispatch(granted({ lat: next.lat, lng: next.lng }));
+          persist(next);
+          resolve({ lat: next.lat, lng: next.lng });
+        },
+        (error) => {
+          if (error.code === error.PERMISSION_DENIED) {
+            dispatch(denied());
+          } else {
+            dispatch(unavailable());
+          }
+          resolve(null);
+        },
+        { enableHighAccuracy: false, timeout: 8000 }
+      );
+    });
   }, [dispatch, persist]);
 
   const selectRegion = useCallback(
