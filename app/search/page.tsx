@@ -5,7 +5,7 @@ import { SortToggle, RadiusFilter } from "@/components/sort-toggle";
 import { SearchResults } from "@/components/search-results";
 import { NoticeBanner } from "@/components/ui/NoticeBanner";
 
-// TODO(Task 012): 백엔드 T-15가 준비되면 API.md §5 실제 응답과 대조해 필드명을 검증한다.
+// docs/API.md §5 (T-15) 실제 응답 형태와 맞춰뒀다.
 interface SearchResponse {
   drug: { id: number; displayName: string; packageUnit: string; imageUrl: string };
   query: {

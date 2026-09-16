@@ -3,7 +3,7 @@ import { PriceTag } from "@/components/ui/PriceTag";
 import { DistanceBadge } from "@/components/ui/DistanceBadge";
 import { formatRelativeDate } from "@/lib/format";
 
-// TODO(Task 012): 백엔드 T-15가 준비되면 API.md §5 실제 응답과 대조해 필드명을 검증한다.
+// docs/API.md §5 (T-15) 실제 응답 형태와 맞춰뒀다.
 export interface SearchResultItem {
   rank: number;
   recommended: boolean;
