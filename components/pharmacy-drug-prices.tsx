@@ -5,7 +5,7 @@ import { PriceTag } from "@/components/ui/PriceTag";
 import { formatRelativeDate } from "@/lib/format";
 import { PriceHistoryChart } from "@/components/price-history-chart";
 
-// TODO(Task 013): 백엔드 T-19가 준비되면 API.md §4 실제 응답과 대조해 필드명을 검증한다.
+// docs/API.md §4 (T-19) 실제 응답 형태와 맞춰뒀다.
 export interface DrugPrice {
   drugId: number;
   displayName: string;

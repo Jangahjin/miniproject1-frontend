@@ -3,7 +3,7 @@ import { apiFetch, ApiError } from "@/lib/api";
 import { DistanceBadge } from "@/components/ui/DistanceBadge";
 import { PharmacyDrugPrices, type DrugPrice } from "@/components/pharmacy-drug-prices";
 
-// TODO(Task 013): 백엔드 T-19가 준비되면 API.md §4 실제 응답과 대조해 필드명을 검증한다.
+// docs/API.md §4 (T-19) 실제 응답 형태와 맞춰뒀다.
 interface PharmacyDetail {
   id: number;
   name: string;
