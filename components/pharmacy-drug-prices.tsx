@@ -64,11 +64,41 @@ export function PharmacyDrugPrices({
   drugPrices: DrugPrice[];
 }) {
   const [expandedDrugId, setExpandedDrugId] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState("전체");
   const groups = groupByCategory(drugPrices);
+  const visibleGroups = activeTab === "전체" ? groups : groups.filter(([category]) => category === activeTab);
 
   return (
-    <div className="flex flex-col gap-5">
-      {groups.map(([category, drugs]) => (
+    <div className="flex flex-col gap-4">
+      <nav className="-mx-4 flex gap-5 overflow-x-auto border-b border-gray-200 px-4 text-sm">
+        <button
+          type="button"
+          onClick={() => setActiveTab("전체")}
+          className={`shrink-0 whitespace-nowrap pb-2 ${
+            activeTab === "전체"
+              ? "border-b-2 border-blue-600 font-semibold text-blue-600"
+              : "text-gray-400 hover:text-gray-600"
+          }`}
+        >
+          전체
+        </button>
+        {groups.map(([category]) => (
+          <button
+            key={category}
+            type="button"
+            onClick={() => setActiveTab(category)}
+            className={`shrink-0 whitespace-nowrap pb-2 ${
+              activeTab === category
+                ? "border-b-2 border-blue-600 font-semibold text-blue-600"
+                : "text-gray-400 hover:text-gray-600"
+            }`}
+          >
+            {category}
+          </button>
+        ))}
+      </nav>
+
+      {visibleGroups.map(([category, drugs]) => (
         <section key={category}>
           <h3 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-gray-700">
             <span aria-hidden="true">{CATEGORY_ICON[category] ?? "💊"}</span>
