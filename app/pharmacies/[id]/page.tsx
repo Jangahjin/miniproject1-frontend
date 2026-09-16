@@ -65,7 +65,7 @@ export default async function PharmacyDetailPage({ params, searchParams }: Pharm
   const todayKey = DAY_ORDER[(today + 6) % 7]; // DAY_ORDER는 월요일 시작이라 보정한다.
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       <PharmacyImageCarousel pharmacyName={pharmacy.name} />
 
       <section className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4">

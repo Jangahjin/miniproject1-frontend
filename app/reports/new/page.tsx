@@ -231,7 +231,7 @@ function ReportForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="mx-auto w-full max-w-3xl">
       <h1>가격 제보하기</h1>
 
       <section>

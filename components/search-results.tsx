@@ -42,7 +42,7 @@ export function SearchResults({
           />
         ))}
       </ul>
-      <div className="hidden h-72 overflow-hidden rounded-xl border border-gray-200 md:block md:w-1/2">
+      <div className="hidden h-72 overflow-hidden rounded-xl border border-gray-200 md:sticky md:top-24 md:block md:h-[calc(100vh-8rem)] md:w-1/2">
         <PharmacyMap
           markers={markers}
           userLocation={userLocation}

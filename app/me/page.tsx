@@ -60,7 +60,7 @@ export default function MyReportsPage() {
   });
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       <h1 className="text-xl font-bold text-gray-900">내 제보</h1>
 
       <section className="rounded-xl border border-gray-200 bg-white p-4">

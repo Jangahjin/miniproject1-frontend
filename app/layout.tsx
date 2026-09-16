@@ -31,7 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col bg-gray-50 text-gray-900">
         <Providers>
           <header className="sticky top-0 z-10 border-b border-gray-200 bg-white">
-            <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-3 px-4 py-3">
+            <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3">
               <Link href="/" className="text-lg font-bold text-blue-600 hover:text-blue-700">
                 약값알림
               </Link>
@@ -42,7 +42,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </div>
             <NoticeBanner />
           </header>
-          <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 py-8">
+          <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-8">
             {children}
           </main>
           <footer className="border-t border-gray-200 bg-white">
