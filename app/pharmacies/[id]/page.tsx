@@ -30,6 +30,9 @@ const DAY_LABEL: Record<string, string> = {
   holiday: "공휴일",
 };
 
+// businessHours는 JSON 객체 키 순서라 월~일 순서가 보장되지 않는다. 표시 순서를 직접 고정한다.
+const DAY_ORDER = ["mon", "tue", "wed", "thu", "fri", "sat", "sun", "holiday"];
+
 interface PharmacyPageProps {
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -57,42 +60,70 @@ export default async function PharmacyDetailPage({ params, searchParams }: Pharm
     return <p role="alert">{message}</p>;
   }
 
+  const orderedHours = DAY_ORDER.filter((day) => day in pharmacy.businessHours);
+  const today = new Date().getDay(); // 0=일 ... 6=토
+  const todayKey = DAY_ORDER[(today + 6) % 7]; // DAY_ORDER는 월요일 시작이라 보정한다.
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       <PharmacyImageCarousel pharmacyName={pharmacy.name} />
 
-      <h1 className="text-xl font-bold text-gray-900">{pharmacy.name}</h1>
-      <p>
-        {pharmacy.addressRoad}
-        {pharmacy.distanceM !== null && (
-          <>
-            {" · "}
-            <DistanceBadge meters={pharmacy.distanceM} />
-          </>
-        )}
-      </p>
-      <p>
-        <a href={`tel:${pharmacy.phone}`}>{pharmacy.phone}</a>
-      </p>
-      <a
-        href={`https://map.kakao.com/link/to/${encodeURIComponent(pharmacy.name)},${pharmacy.lat},${pharmacy.lng}`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        길찾기
-      </a>
+      <section className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4">
+        <h1 className="text-xl font-bold text-gray-900">{pharmacy.name}</h1>
 
-      <ul>
-        {Object.entries(pharmacy.businessHours).map(([day, hours]) => (
-          <li key={day}>
-            {DAY_LABEL[day] ?? day}: {hours ? `${hours[0]} - ${hours[1]}` : "휴무"}
-          </li>
-        ))}
-      </ul>
+        <div className="flex flex-col gap-1 text-sm text-gray-600">
+          <p className="flex flex-wrap items-center gap-2">
+            <span>{pharmacy.addressRoad}</span>
+            {pharmacy.distanceM !== null && <DistanceBadge meters={pharmacy.distanceM} />}
+          </p>
+          <a href={`tel:${pharmacy.phone}`} className="w-fit text-blue-600 hover:underline">
+            {pharmacy.phone}
+          </a>
+        </div>
 
-      <Link href={`/reports/new?pharmacyId=${pharmacy.id}`}>이 약국에 가격 제보하기</Link>
+        <div className="flex flex-wrap gap-2 pt-1">
+          <a
+            href={`https://map.kakao.com/link/to/${encodeURIComponent(pharmacy.name)},${pharmacy.lat},${pharmacy.lng}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-full border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:border-blue-400 hover:text-blue-600"
+          >
+            길찾기
+          </a>
+          <Link
+            href={`/reports/new?pharmacyId=${pharmacy.id}`}
+            className="rounded-full bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            이 약국에 가격 제보하기
+          </Link>
+        </div>
+      </section>
 
-      <PharmacyDrugPrices pharmacyId={pharmacy.id} drugPrices={pharmacy.drugPrices} />
+      <section className="rounded-xl border border-gray-200 bg-white p-4">
+        <h2 className="mb-3 text-sm font-semibold text-gray-900">영업시간</h2>
+        <ul className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm sm:grid-cols-4">
+          {orderedHours.map((day) => {
+            const hours = pharmacy.businessHours[day];
+            const isToday = day === todayKey;
+            return (
+              <li
+                key={day}
+                className={`flex justify-between gap-2 ${isToday ? "font-semibold text-blue-600" : "text-gray-600"}`}
+              >
+                <span>{DAY_LABEL[day] ?? day}</span>
+                <span className={hours ? "" : "text-gray-400"}>
+                  {hours ? `${hours[0]} - ${hours[1]}` : "휴무"}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      <section className="rounded-xl border border-gray-200 bg-white p-4">
+        <h2 className="mb-3 text-sm font-semibold text-gray-900">취급 의약품</h2>
+        <PharmacyDrugPrices pharmacyId={pharmacy.id} drugPrices={pharmacy.drugPrices} />
+      </section>
     </div>
   );
 }

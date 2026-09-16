@@ -30,50 +30,55 @@ export function PharmacyDrugPrices({
   const [expandedDrugId, setExpandedDrugId] = useState<number | null>(null);
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>약품</th>
-          <th>대표가격</th>
-          <th>제보 수</th>
-          <th>최근 갱신</th>
-          <th>전국 평균 대비</th>
-        </tr>
-      </thead>
-      <tbody>
-        {drugPrices.map((drug) => (
-          <Fragment key={drug.drugId}>
-            <tr>
-              <td>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setExpandedDrugId((prev) => (prev === drug.drugId ? null : drug.drugId))
-                  }
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[480px] text-left text-sm">
+        <thead>
+          <tr className="border-b border-gray-200 text-xs text-gray-500">
+            <th className="py-2 font-medium">약품</th>
+            <th className="py-2 font-medium">대표가격</th>
+            <th className="py-2 font-medium">제보 수</th>
+            <th className="py-2 font-medium">최근 갱신</th>
+            <th className="py-2 font-medium">전국 평균 대비</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
+          {drugPrices.map((drug) => (
+            <Fragment key={drug.drugId}>
+              <tr className="hover:bg-gray-50">
+                <td className="py-2 pr-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setExpandedDrugId((prev) => (prev === drug.drugId ? null : drug.drugId))
+                    }
+                    className="text-left font-medium text-gray-900 hover:text-blue-600"
+                  >
+                    {drug.displayName} ({drug.packageUnit})
+                  </button>
+                </td>
+                <td className="py-2">
+                  <PriceTag price={drug.repPrice} />
+                </td>
+                <td className="py-2 text-gray-600">{drug.reportCount}건</td>
+                <td className="py-2 text-gray-600">{formatRelativeDate(drug.lastReportedAt)}</td>
+                <td
+                  className={`py-2 font-medium ${drug.diffFromNationalAvg < 0 ? "text-green-600" : "text-gray-500"}`}
                 >
-                  {drug.displayName} ({drug.packageUnit})
-                </button>
-              </td>
-              <td>
-                <PriceTag price={drug.repPrice} />
-              </td>
-              <td>{drug.reportCount}건</td>
-              <td>{formatRelativeDate(drug.lastReportedAt)}</td>
-              <td style={{ color: drug.diffFromNationalAvg < 0 ? "green" : "gray" }}>
-                {drug.diffFromNationalAvg > 0 ? "+" : ""}
-                {drug.diffFromNationalAvg}원
-              </td>
-            </tr>
-            {expandedDrugId === drug.drugId && (
-              <tr>
-                <td colSpan={5}>
-                  <PriceHistoryChart pharmacyId={pharmacyId} drugId={drug.drugId} />
+                  {drug.diffFromNationalAvg > 0 ? "+" : ""}
+                  {drug.diffFromNationalAvg}원
                 </td>
               </tr>
-            )}
-          </Fragment>
-        ))}
-      </tbody>
-    </table>
+              {expandedDrugId === drug.drugId && (
+                <tr>
+                  <td colSpan={5} className="bg-gray-50 py-3">
+                    <PriceHistoryChart pharmacyId={pharmacyId} drugId={drug.drugId} />
+                  </td>
+                </tr>
+              )}
+            </Fragment>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
