@@ -2,6 +2,7 @@ import Link from "next/link";
 import { apiFetch, ApiError } from "@/lib/api";
 import { DistanceBadge } from "@/components/ui/DistanceBadge";
 import { PharmacyDrugPrices, type DrugPrice } from "@/components/pharmacy-drug-prices";
+import { PharmacyImageCarousel } from "@/components/pharmacy-image-carousel";
 
 // docs/API.md §4 (T-19) 실제 응답 형태와 맞춰뒀다.
 interface PharmacyDetail {
@@ -57,8 +58,10 @@ export default async function PharmacyDetailPage({ params, searchParams }: Pharm
   }
 
   return (
-    <div>
-      <h1>{pharmacy.name}</h1>
+    <div className="flex flex-col gap-4">
+      <PharmacyImageCarousel pharmacyName={pharmacy.name} />
+
+      <h1 className="text-xl font-bold text-gray-900">{pharmacy.name}</h1>
       <p>
         {pharmacy.addressRoad}
         {pharmacy.distanceM !== null && (
