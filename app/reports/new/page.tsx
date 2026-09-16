@@ -227,25 +227,30 @@ function ReportForm() {
   }
 
   if (success && !warning) {
-    return <p role="status">제보 감사합니다! 잠시 후 약국 상세로 이동합니다.</p>;
+    return (
+      <p role="status" className="py-16 text-center text-sm text-gray-600">
+        제보 감사합니다! 잠시 후 약국 상세로 이동합니다.
+      </p>
+    );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto w-full max-w-3xl">
-      <h1>가격 제보하기</h1>
+    <form onSubmit={handleSubmit} className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+      <h1 className="text-xl font-bold text-gray-900">가격 제보하기</h1>
 
-      <section>
-        <h2>약국</h2>
+      <section className="flex flex-col gap-2">
+        <h2 className="text-sm font-semibold text-gray-700">약국</h2>
         {draft.pharmacyName ? (
-          <p>
-            {draft.pharmacyName}{" "}
+          <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4">
+            <span className="font-medium text-gray-900">{draft.pharmacyName}</span>
             <button
               type="button"
               onClick={() => updateDraft({ pharmacyId: null, pharmacyName: "" })}
+              className="text-sm font-medium text-blue-600 hover:underline"
             >
               변경
             </button>
-          </p>
+          </div>
         ) : (
           <PharmacyPicker
             onSelect={(pharmacy: PharmacySummary) =>
@@ -255,18 +260,21 @@ function ReportForm() {
         )}
       </section>
 
-      <section>
-        <h2>약품</h2>
+      <section className="flex flex-col gap-2">
+        <h2 className="text-sm font-semibold text-gray-700">약품</h2>
         {draft.drugName ? (
-          <p>
-            {draft.drugName} ({draft.packageUnit}){" "}
+          <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4">
+            <span className="font-medium text-gray-900">
+              {draft.drugName} <span className="text-sm font-normal text-gray-500">({draft.packageUnit})</span>
+            </span>
             <button
               type="button"
               onClick={() => updateDraft({ drugId: null, drugName: "", packageUnit: "" })}
+              className="text-sm font-medium text-blue-600 hover:underline"
             >
               변경
             </button>
-          </p>
+          </div>
         ) : (
           <DrugAutocomplete
             value={drugQuery}
@@ -283,72 +291,128 @@ function ReportForm() {
         )}
       </section>
 
-      <section>
-        <h2>가격</h2>
-        <label htmlFor="price">가격 (원)</label>
-        <input
-          id="price"
-          inputMode="numeric"
-          value={formatPriceDisplay(draft.price)}
-          onChange={(event) => handlePriceChange(event.target.value)}
-        />
-        {priceError && <p role="alert">{priceError}</p>}
+      <section className="flex flex-col gap-2">
+        <h2 className="text-sm font-semibold text-gray-700">가격</h2>
+        <div className="flex flex-col gap-1">
+          <label htmlFor="price" className="text-sm font-medium text-gray-700">
+            가격 (원)
+          </label>
+          <input
+            id="price"
+            inputMode="numeric"
+            value={formatPriceDisplay(draft.price)}
+            onChange={(event) => handlePriceChange(event.target.value)}
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+          />
+          {priceError && (
+            <p role="alert" className="text-xs text-red-600">
+              {priceError}
+            </p>
+          )}
+        </div>
       </section>
 
-      <details>
-        <summary>구매일 · 영수증 · 메모 (선택)</summary>
+      <details className="group rounded-xl border border-gray-200 bg-white p-4">
+        <summary className="cursor-pointer text-sm font-semibold text-gray-700">
+          구매일 · 영수증 · 메모 (선택)
+        </summary>
 
-        <label htmlFor="purchasedAt">구매일</label>
-        <input
-          id="purchasedAt"
-          type="date"
-          max={todayISODate()}
-          value={draft.purchasedAt}
-          onChange={(event) => updateDraft({ purchasedAt: event.target.value })}
-        />
+        <div className="mt-4 flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="purchasedAt" className="text-sm font-medium text-gray-700">
+              구매일
+            </label>
+            <input
+              id="purchasedAt"
+              type="date"
+              max={todayISODate()}
+              value={draft.purchasedAt}
+              onChange={(event) => updateDraft({ purchasedAt: event.target.value })}
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            />
+          </div>
 
-        <label htmlFor="receipt">영수증 (선택)</label>
-        {receiptPreviewUrl ? (
-          <p>
-            {/* eslint-disable-next-line @next/next/no-img-element -- blob: URL 미리보기라 next/image 최적화 대상이 아니다 */}
-            <img src={receiptPreviewUrl} alt="영수증 미리보기" width={80} height={80} />
-            {receiptFileName}
-            {isUploadingReceipt && " (업로드 중...)"}
-            {draft.receiptFileId && !isUploadingReceipt && " (업로드 완료)"}{" "}
-            <button type="button" onClick={clearReceipt} disabled={isUploadingReceipt}>
-              삭제
-            </button>
-          </p>
-        ) : (
-          <input
-            id="receipt"
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            onChange={handleReceiptChange}
-            disabled={isUploadingReceipt}
-          />
-        )}
-        {receiptError && <p role="alert">{receiptError}</p>}
+          <div className="flex flex-col gap-1">
+            <label htmlFor="receipt" className="text-sm font-medium text-gray-700">
+              영수증 (선택)
+            </label>
+            {receiptPreviewUrl ? (
+              <div className="flex items-center gap-3 rounded-lg border border-gray-200 p-3">
+                {/* eslint-disable-next-line @next/next/no-img-element -- blob: URL 미리보기라 next/image 최적화 대상이 아니다 */}
+                <img
+                  src={receiptPreviewUrl}
+                  alt="영수증 미리보기"
+                  width={64}
+                  height={64}
+                  className="h-16 w-16 shrink-0 rounded-lg object-cover"
+                />
+                <div className="flex flex-1 flex-col gap-0.5 text-sm">
+                  <span className="text-gray-900">{receiptFileName}</span>
+                  {isUploadingReceipt && <span className="text-xs text-gray-500">업로드 중...</span>}
+                  {draft.receiptFileId && !isUploadingReceipt && (
+                    <span className="text-xs text-blue-600">업로드 완료</span>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={clearReceipt}
+                  disabled={isUploadingReceipt}
+                  className="text-sm font-medium text-red-600 hover:underline disabled:opacity-50"
+                >
+                  삭제
+                </button>
+              </div>
+            ) : (
+              <input
+                id="receipt"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleReceiptChange}
+                disabled={isUploadingReceipt}
+                className="text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-blue-600 hover:file:bg-blue-100"
+              />
+            )}
+            {receiptError && (
+              <p role="alert" className="text-xs text-red-600">
+                {receiptError}
+              </p>
+            )}
+          </div>
 
-        <label htmlFor="memo">메모</label>
-        <textarea
-          id="memo"
-          maxLength={200}
-          value={draft.memo}
-          onChange={(event) => updateDraft({ memo: event.target.value })}
-        />
+          <div className="flex flex-col gap-1">
+            <label htmlFor="memo" className="text-sm font-medium text-gray-700">
+              메모
+            </label>
+            <textarea
+              id="memo"
+              maxLength={200}
+              rows={3}
+              value={draft.memo}
+              onChange={(event) => updateDraft({ memo: event.target.value })}
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+        </div>
       </details>
 
-      {submitError && <p role="alert">{submitError}</p>}
+      {submitError && (
+        <p role="alert" className="text-sm text-red-600">
+          {submitError}
+        </p>
+      )}
       {warning && (
-        <div role="alert">
+        <div role="alert" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
           <p>{warning}</p>
-          <p>그래도 제보되었습니다. 잠시 후 약국 상세로 이동합니다.</p>
+          <p className="mt-1 text-xs text-amber-700">그래도 제보되었습니다. 잠시 후 약국 상세로 이동합니다.</p>
         </div>
       )}
 
-      <button type="submit" disabled={isSubmitting || isUploadingReceipt}>
-        제보하기
+      <button
+        type="submit"
+        disabled={isSubmitting || isUploadingReceipt}
+        className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+      >
+        {isSubmitting ? "제보 중..." : "제보하기"}
       </button>
     </form>
   );

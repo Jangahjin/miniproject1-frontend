@@ -36,28 +36,37 @@ export function PharmacyPicker({
   const results = data?.content ?? [];
 
   return (
-    <div>
+    <div className="relative">
       <input
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder="약국명을 검색하세요"
+        className="w-full rounded-xl border border-gray-300 px-4 py-3 text-base shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
       />
-      {isFetching && <span>검색 중...</span>}
-      <ul>
-        {results.map((pharmacy) => (
-          <li key={pharmacy.id}>
-            <button
-              type="button"
-              onClick={() => {
-                onSelect(pharmacy);
-                setQuery("");
-              }}
-            >
-              {pharmacy.name} — {pharmacy.addressRoad}
-            </button>
-          </li>
-        ))}
-      </ul>
+      {isFetching && (
+        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+          검색 중...
+        </span>
+      )}
+      {results.length > 0 && (
+        <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white text-left shadow-lg">
+          {results.map((pharmacy) => (
+            <li key={pharmacy.id}>
+              <button
+                type="button"
+                onClick={() => {
+                  onSelect(pharmacy);
+                  setQuery("");
+                }}
+                className="block w-full px-4 py-2 text-left text-sm hover:bg-blue-50"
+              >
+                <span className="font-medium text-gray-900">{pharmacy.name}</span>{" "}
+                <span className="text-gray-500">{pharmacy.addressRoad}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
       {/* "지도에서 고르기"는 범위 밖 — 카카오맵 지도 클릭 좌표 -> 약국 역매핑 API가 없어 지금은 이름 검색만 지원 */}
     </div>
   );
