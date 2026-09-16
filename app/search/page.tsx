@@ -3,7 +3,6 @@ import { apiFetch, ApiError } from "@/lib/api";
 import type { SearchResultItem } from "@/components/pharmacy-result-card";
 import { SortToggle, RadiusFilter } from "@/components/sort-toggle";
 import { SearchResults } from "@/components/search-results";
-import { NoticeBanner } from "@/components/ui/NoticeBanner";
 
 // docs/API.md §5 (T-15) 실제 응답 형태와 맞춰뒀다.
 interface SearchResponse {
@@ -95,7 +94,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      {(data.dataSource === "SEED" || data.dataSource === "MIXED") && <NoticeBanner />}
       <h1 className="text-xl font-bold text-gray-900">{data.drug.displayName} 검색 결과</h1>
 
       {data.summary.resultCount > 0 ? (
