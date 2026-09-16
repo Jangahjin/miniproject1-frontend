@@ -19,7 +19,9 @@ export function AuthStatus() {
 
   return (
     <span className="flex items-center gap-2">
-      {user.nickname}님
+      <Link href="/me" className="hover:underline">
+        {user.nickname}님
+      </Link>
       <button
         type="button"
         onClick={() => dispatch(logout())}
