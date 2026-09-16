@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/store";
@@ -45,22 +46,67 @@ function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <h1>로그인</h1>
+    <div className="mx-auto flex w-full max-w-sm flex-col gap-6">
+      <h1 className="text-center text-xl font-bold text-gray-900">로그인</h1>
 
-      <label htmlFor="email">이메일</label>
-      <input id="email" type="email" {...register("email")} />
-      {errors.email && <p role="alert">{errors.email.message}</p>}
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <label htmlFor="email" className="text-sm font-medium text-gray-700">
+            이메일
+          </label>
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            {...register("email")}
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+          />
+          {errors.email && (
+            <p role="alert" className="text-xs text-red-600">
+              {errors.email.message}
+            </p>
+          )}
+        </div>
 
-      <label htmlFor="password">비밀번호</label>
-      <input id="password" type="password" {...register("password")} />
-      {errors.password && <p role="alert">{errors.password.message}</p>}
+        <div className="flex flex-col gap-1">
+          <label htmlFor="password" className="text-sm font-medium text-gray-700">
+            비밀번호
+          </label>
+          <input
+            id="password"
+            type="password"
+            autoComplete="current-password"
+            {...register("password")}
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+          />
+          {errors.password && (
+            <p role="alert" className="text-xs text-red-600">
+              {errors.password.message}
+            </p>
+          )}
+        </div>
 
-      {errors.root && <p role="alert">{errors.root.message}</p>}
+        {errors.root && (
+          <p role="alert" className="text-sm text-red-600">
+            {errors.root.message}
+          </p>
+        )}
 
-      <button type="submit" disabled={isSubmitting}>
-        로그인
-      </button>
-    </form>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+        >
+          {isSubmitting ? "로그인 중..." : "로그인"}
+        </button>
+      </form>
+
+      <p className="text-center text-sm text-gray-500">
+        아직 계정이 없으신가요?{" "}
+        <Link href="/signup" className="font-medium text-blue-600 hover:underline">
+          회원가입
+        </Link>
+      </p>
+    </div>
   );
 }

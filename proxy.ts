@@ -1,20 +1,27 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { REFRESH_TOKEN_COOKIE } from "@/lib/auth-cookie";
 
-// Next.js 16부터 `middleware` 파일/함수명은 deprecated고 `proxy`로 대체됐다
-// (node_modules/next/dist/docs/01-app/02-guides/upgrading/version-16.md 참고).
-// accessToken은 클라이언트 메모리(Redux)에만 있어 이 요청에는 실려오지 않는다.
-// 여기서는 httpOnly refreshToken 쿠키의 존재 여부만으로 "로그인 상태일 가능성"을 판단한다.
-// 실제 유효성(만료·revoke)은 백엔드 API 호출 시점에 401로 걸러진다.
+// accessToken은 Redux(메모리)에만 있어 proxy(서버 경계)에서는 볼 수 없다.
+// 로그인 여부의 서버 사이드 신호는 httpOnly refreshToken 쿠키뿐이다 — 쿠키가
+// 만료/revoke됐는데 남아있는 경우는 클라이언트의 401 인터셉터가 처리한다
+// (docs/ROADMAP.md T-25). Next.js 16부터 middleware.ts는 proxy.ts로 대체됐다.
+const PROTECTED_PATHS = ["/reports/new", "/me", "/admin"];
+
 export function proxy(request: NextRequest) {
-  const hasSession = request.cookies.has(REFRESH_TOKEN_COOKIE);
-  if (hasSession) return NextResponse.next();
+  const { pathname } = request.nextUrl;
+  const isProtected = PROTECTED_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  );
+  if (!isProtected) return NextResponse.next();
+
+  if (request.cookies.has(REFRESH_TOKEN_COOKIE)) return NextResponse.next();
 
   const loginUrl = new URL("/login", request.url);
-  loginUrl.searchParams.set("next", request.nextUrl.pathname);
+  loginUrl.searchParams.set("next", pathname + request.nextUrl.search);
   return NextResponse.redirect(loginUrl);
 }
 
 export const config = {
-  matcher: ["/reports/new", "/me", "/admin/:path*"],
+  matcher: ["/reports/new/:path*", "/me/:path*", "/admin/:path*"],
 };
