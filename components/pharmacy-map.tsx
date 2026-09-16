@@ -70,6 +70,7 @@ export function PharmacyMap({
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<KakaoMap | null>(null);
   const markerRefs = useRef<Map<number, KakaoMarker>>(new Map());
+  const hasApiKey = Boolean(process.env.NEXT_PUBLIC_KAKAO_MAP_KEY);
   const [sdkFailed, setSdkFailed] = useState(false);
   const [sdkReady, setSdkReady] = useState(false);
 
@@ -122,8 +123,21 @@ export function PharmacyMap({
     if (marker) mapRef.current.panTo(marker.getPosition());
   }, [selectedId, sdkReady]);
 
-  // SDK 로드 실패 시 지도 영역만 숨기고 리스트는 그대로 동작해야 한다 (T-22 완료 판정).
-  if (sdkFailed) return null;
+  // API 키가 없거나 SDK 로드에 실패해도 리스트는 그대로 동작해야 한다 (T-22 완료 판정).
+  // 빈 박스만 남기지 않고, 이 영역이 무엇인지 안내한다.
+  if (!hasApiKey || sdkFailed) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-1 bg-gray-50 px-4 text-center text-gray-400">
+        <span className="text-2xl" aria-hidden="true">
+          🗺️
+        </span>
+        <span className="text-sm font-medium">지도 영역</span>
+        <span className="text-xs">
+          카카오맵 API 키를 설정하면 이 자리에 약국 위치가 표시됩니다
+        </span>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -133,7 +147,7 @@ export function PharmacyMap({
         onLoad={initMap}
         onError={() => setSdkFailed(true)}
       />
-      <div ref={containerRef} style={{ width: "100%", height: "100%", minHeight: 400 }} />
+      <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
     </>
   );
 }

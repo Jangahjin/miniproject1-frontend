@@ -42,10 +42,7 @@ export function SearchResults({
           />
         ))}
       </ul>
-      <div
-        className="hidden overflow-hidden rounded-xl border border-gray-200 md:block md:w-1/2"
-        style={{ minHeight: 400 }}
-      >
+      <div className="hidden h-72 overflow-hidden rounded-xl border border-gray-200 md:block md:w-1/2">
         <PharmacyMap
           markers={markers}
           userLocation={userLocation}
