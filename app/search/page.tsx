@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { apiFetch, ApiError } from "@/lib/api";
+import { apiFetch } from "@/lib/api";
+import { getErrorMessage } from "@/lib/error-message";
 import type { SearchResultItem } from "@/components/pharmacy-result-card";
 import { SortToggle, RadiusFilter } from "@/components/sort-toggle";
 import { SearchResults } from "@/components/search-results";
+import { ErrorRetryLink } from "@/components/ui/ErrorRetryLink";
 
 // docs/API.md §5 (T-15) 실제 응답 형태와 맞춰뒀다.
 interface SearchResponse {
@@ -75,12 +77,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   try {
     data = await apiFetch<SearchResponse>(`/api/v1/search?${query.toString()}`);
   } catch (error) {
-    const message = error instanceof ApiError ? error.message : "검색 결과를 불러오지 못했습니다.";
-    return (
-      <p role="alert" className="py-16 text-center text-sm text-red-600">
-        {message}
-      </p>
-    );
+    return <ErrorRetryLink message={getErrorMessage(error, "검색 결과를 불러오지 못했습니다.")} />;
   }
 
   const currentSearchParams: Record<string, string | undefined> = {

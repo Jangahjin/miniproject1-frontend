@@ -2,7 +2,8 @@
 
 import { Suspense, useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { apiFetch, ApiError } from "@/lib/api";
+import { apiFetch } from "@/lib/api";
+import { getErrorMessage } from "@/lib/error-message";
 import { PharmacyPicker, type PharmacySummary } from "@/components/pharmacy-picker";
 import { DrugAutocomplete } from "@/components/drug-autocomplete";
 import type { DrugSummary } from "@/hooks/use-drug-autocomplete";
@@ -137,9 +138,7 @@ function ReportForm() {
       });
       updateDraft({ receiptFileId: uploaded.id });
     } catch (error) {
-      setReceiptError(
-        error instanceof ApiError ? error.message : "영수증 업로드에 실패했어요. 다시 시도해주세요."
-      );
+      setReceiptError(getErrorMessage(error, "영수증 업로드에 실패했어요. 다시 시도해주세요."));
       clearReceipt();
     } finally {
       setIsUploadingReceipt(false);
@@ -214,13 +213,9 @@ function ReportForm() {
         response.flagged ? 3000 : 1000
       );
     } catch (error) {
-      if (error instanceof ApiError && error.code === "DUPLICATE_REPORT") {
-        setSubmitError("오늘 이미 이 약국의 해당 약품 가격을 제보하셨습니다.");
-      } else if (error instanceof ApiError) {
-        setSubmitError(error.message);
-      } else {
-        setSubmitError("제보에 실패했습니다. 잠시 후 다시 시도해주세요.");
-      }
+      // 백엔드(docs/ROADMAP.md T-35)가 DUPLICATE_REPORT를 포함해 항상 정제된 한글
+      // 메시지를 주므로 코드별로 분기할 필요가 없다.
+      setSubmitError(getErrorMessage(error, "제보에 실패했습니다. 잠시 후 다시 시도해주세요."));
     } finally {
       setIsSubmitting(false);
     }
@@ -302,10 +297,12 @@ function ReportForm() {
             inputMode="numeric"
             value={formatPriceDisplay(draft.price)}
             onChange={(event) => handlePriceChange(event.target.value)}
+            aria-invalid={!!priceError}
+            aria-describedby={priceError ? "price-error" : undefined}
             className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
           />
           {priceError && (
-            <p role="alert" className="text-xs text-red-600">
+            <p id="price-error" role="alert" className="text-xs text-red-600">
               {priceError}
             </p>
           )}
@@ -369,11 +366,13 @@ function ReportForm() {
                 accept="image/jpeg,image/png,image/webp"
                 onChange={handleReceiptChange}
                 disabled={isUploadingReceipt}
+                aria-invalid={!!receiptError}
+                aria-describedby={receiptError ? "receipt-error" : undefined}
                 className="text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-blue-600 hover:file:bg-blue-100"
               />
             )}
             {receiptError && (
-              <p role="alert" className="text-xs text-red-600">
+              <p id="receipt-error" role="alert" className="text-xs text-red-600">
                 {receiptError}
               </p>
             )}

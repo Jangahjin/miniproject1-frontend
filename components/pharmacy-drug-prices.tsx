@@ -4,6 +4,7 @@ import { useState } from "react";
 import { PriceTag } from "@/components/ui/PriceTag";
 import { formatRelativeDate } from "@/lib/format";
 import { PriceHistoryChart } from "@/components/price-history-chart";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 // docs/API.md §4 (T-19) 실제 응답 형태와 맞춰뒀다.
 export interface DrugPrice {
@@ -67,6 +68,10 @@ export function PharmacyDrugPrices({
   const [activeTab, setActiveTab] = useState("전체");
   const groups = groupByCategory(drugPrices);
   const visibleGroups = activeTab === "전체" ? groups : groups.filter(([category]) => category === activeTab);
+
+  if (drugPrices.length === 0) {
+    return <EmptyState message="등록된 취급 의약품이 없습니다." />;
+  }
 
   return (
     <div className="flex flex-col gap-4">

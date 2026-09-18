@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const signupSchema = z.object({
-  email: z.string().email("올바른 이메일 형식이 아닙니다.").max(255),
+  email: z.string().email("올바른 이메일 형식이 아닙니다.").max(255, "이메일은 최대 255자까지 입력할 수 있습니다."),
   password: z
     .string()
     .min(8, "8~64자로 입력하세요.")
@@ -20,12 +20,13 @@ const signupSchema = z.object({
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
+  // app/(auth)/login/page.tsx와 동일한 이유로 onBlur를 쓴다 (docs/ROADMAP.md T-36).
   const {
     register,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<SignupFormValues>({ resolver: zodResolver(signupSchema) });
+  } = useForm<SignupFormValues>({ resolver: zodResolver(signupSchema), mode: "onBlur" });
   const router = useRouter();
 
   async function onSubmit(values: SignupFormValues) {
@@ -61,11 +62,13 @@ export default function SignupPage() {
             id="email"
             type="email"
             autoComplete="email"
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? "email-error" : undefined}
             {...register("email")}
             className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
           />
           {errors.email && (
-            <p role="alert" className="text-xs text-red-600">
+            <p id="email-error" role="alert" className="text-xs text-red-600">
               {errors.email.message}
             </p>
           )}
@@ -79,12 +82,16 @@ export default function SignupPage() {
             id="password"
             type="password"
             autoComplete="new-password"
+            aria-invalid={!!errors.password}
+            aria-describedby={errors.password ? "password-hint password-error" : "password-hint"}
             {...register("password")}
             className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
           />
-          <p className="text-xs text-gray-400">8~64자, 영문과 숫자를 모두 포함해야 합니다.</p>
+          <p id="password-hint" className="text-xs text-gray-400">
+            8~64자, 영문과 숫자를 모두 포함해야 합니다.
+          </p>
           {errors.password && (
-            <p role="alert" className="text-xs text-red-600">
+            <p id="password-error" role="alert" className="text-xs text-red-600">
               {errors.password.message}
             </p>
           )}
@@ -98,11 +105,13 @@ export default function SignupPage() {
             id="nickname"
             type="text"
             autoComplete="nickname"
+            aria-invalid={!!errors.nickname}
+            aria-describedby={errors.nickname ? "nickname-error" : undefined}
             {...register("nickname")}
             className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
           />
           {errors.nickname && (
-            <p role="alert" className="text-xs text-red-600">
+            <p id="nickname-error" role="alert" className="text-xs text-red-600">
               {errors.nickname.message}
             </p>
           )}

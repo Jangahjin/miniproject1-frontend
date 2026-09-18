@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { apiFetch, ApiError } from "@/lib/api";
+import { apiFetch } from "@/lib/api";
+import { getErrorMessage } from "@/lib/error-message";
 import { DistanceBadge } from "@/components/ui/DistanceBadge";
 import { PharmacyDrugPrices, type DrugPrice } from "@/components/pharmacy-drug-prices";
 import { PharmacyImageCarousel } from "@/components/pharmacy-image-carousel";
+import { ErrorRetryLink } from "@/components/ui/ErrorRetryLink";
 
 // docs/API.md §4 (T-19) 실제 응답 형태와 맞춰뒀다.
 interface PharmacyDetail {
@@ -56,8 +58,7 @@ export default async function PharmacyDetailPage({ params, searchParams }: Pharm
       `/api/v1/pharmacies/${id}${qs.toString() ? `?${qs}` : ""}`
     );
   } catch (error) {
-    const message = error instanceof ApiError ? error.message : "약국 정보를 불러오지 못했습니다.";
-    return <p role="alert">{message}</p>;
+    return <ErrorRetryLink message={getErrorMessage(error, "약국 정보를 불러오지 못했습니다.")} />;
   }
 
   const orderedHours = DAY_ORDER.filter((day) => day in pharmacy.businessHours);

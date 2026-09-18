@@ -2,7 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { apiFetch, ApiError } from "@/lib/api";
+import { apiFetch } from "@/lib/api";
+import { getErrorMessage } from "@/lib/error-message";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
@@ -81,11 +82,7 @@ export default function MyReportsPage() {
         <LoadingSkeleton />
       ) : reportsQuery.isError ? (
         <ErrorState
-          message={
-            reportsQuery.error instanceof ApiError
-              ? reportsQuery.error.message
-              : "제보 목록을 불러오지 못했습니다."
-          }
+          message={getErrorMessage(reportsQuery.error, "제보 목록을 불러오지 못했습니다.")}
           onRetry={() => reportsQuery.refetch()}
         />
       ) : reportsQuery.data?.content.length === 0 ? (

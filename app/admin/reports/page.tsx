@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { apiFetch, ApiError } from "@/lib/api";
+import { getErrorMessage } from "@/lib/error-message";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
@@ -68,7 +69,7 @@ export default function AdminReportsPage() {
       setConfirmTarget(null);
       await refreshAfterAction();
     } catch (error) {
-      setActionError(error instanceof ApiError ? error.message : "처리에 실패했습니다.");
+      setActionError(getErrorMessage(error, "처리에 실패했습니다."));
     }
   }
 
@@ -82,7 +83,7 @@ export default function AdminReportsPage() {
       });
       await refreshAfterAction();
     } catch (error) {
-      setActionError(error instanceof ApiError ? error.message : "처리에 실패했습니다.");
+      setActionError(getErrorMessage(error, "처리에 실패했습니다."));
     }
   }
 

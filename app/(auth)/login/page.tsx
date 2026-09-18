@@ -26,12 +26,16 @@ export default function LoginPage() {
 }
 
 function LoginForm() {
+  // mode 기본값(onSubmit)에서는 이 RHF/React 조합에서 첫 제출 실패 시 formState.errors가
+  // 렌더에 반영되지 않아 에러가 보이지 않는 버그가 있었다 (docs/ROADMAP.md T-36에서 발견).
+  // onBlur로 바꾸면 같은 값이 blur 시점에 정상 반영된다 — 탭 이동도 blur를 유발하므로
+  // 키보드 흐름과도 맞는다.
   const {
     register,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
+  } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema), mode: "onBlur" });
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -58,11 +62,13 @@ function LoginForm() {
             id="email"
             type="email"
             autoComplete="email"
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? "email-error" : undefined}
             {...register("email")}
             className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
           />
           {errors.email && (
-            <p role="alert" className="text-xs text-red-600">
+            <p id="email-error" role="alert" className="text-xs text-red-600">
               {errors.email.message}
             </p>
           )}
@@ -76,11 +82,13 @@ function LoginForm() {
             id="password"
             type="password"
             autoComplete="current-password"
+            aria-invalid={!!errors.password}
+            aria-describedby={errors.password ? "password-error" : undefined}
             {...register("password")}
             className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
           />
           {errors.password && (
-            <p role="alert" className="text-xs text-red-600">
+            <p id="password-error" role="alert" className="text-xs text-red-600">
               {errors.password.message}
             </p>
           )}
