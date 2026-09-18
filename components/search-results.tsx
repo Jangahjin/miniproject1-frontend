@@ -34,6 +34,7 @@ export function SearchResults({
           <PharmacyResultCard
             key={item.pharmacy.id}
             item={item}
+            isSelected={selectedId === item.pharmacy.id}
             onMouseEnter={() => setSelectedId(item.pharmacy.id)}
             listRef={(el) => {
               if (el) itemRefs.current.set(item.pharmacy.id, el);

@@ -45,10 +45,12 @@ const BADGE_STYLE: Record<string, string> = {
 
 export function PharmacyResultCard({
   item,
+  isSelected,
   onMouseEnter,
   listRef,
 }: {
   item: SearchResultItem;
+  isSelected?: boolean;
   onMouseEnter?: () => void;
   listRef?: (el: HTMLLIElement | null) => void;
 }) {
@@ -57,7 +59,7 @@ export function PharmacyResultCard({
       aria-current={item.recommended ? "true" : undefined}
       onMouseEnter={onMouseEnter}
       ref={listRef}
-      className={`flex flex-col gap-1.5 p-4 hover:bg-gray-50 ${item.recommended ? "bg-blue-50/60" : ""}`}
+      className={`flex flex-col gap-1.5 p-4 transition-colors hover:bg-gray-50 ${item.recommended ? "bg-blue-50/60" : ""} ${isSelected ? "!bg-amber-50 ring-2 ring-inset ring-amber-400" : ""}`}
     >
       <Link href={`/pharmacies/${item.pharmacy.id}`} className="font-semibold text-gray-900 hover:text-blue-600">
         {item.pharmacy.name}

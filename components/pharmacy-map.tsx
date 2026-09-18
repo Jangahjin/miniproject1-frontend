@@ -62,9 +62,12 @@ export interface MapMarkerData {
 function buildOverlayHtml(item: MapMarkerData, isSelected: boolean): string {
   const background = item.rank === 1 ? "#2563eb" : "#111827";
   const highlight = isSelected
-    ? "box-shadow:0 0 0 3px #facc15;transform:scale(1.2);z-index:10;position:relative;"
+    ? "box-shadow:0 0 0 3px #facc15;transform:scale(1.3);z-index:10;position:relative;animation:pharmacy-marker-selected-pulse 1.2s ease-in-out infinite;"
     : "";
-  return `<div style="background:${background};color:#fff;padding:2px 6px;border-radius:4px;font-size:12px;white-space:nowrap;transition:transform .15s ease;${highlight}">${item.price.toLocaleString("ko-KR")}원</div>`;
+  const badge = isSelected
+    ? `<span style="position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:4px;background:#facc15;color:#111827;padding:1px 6px;border-radius:9999px;font-size:10px;font-weight:700;white-space:nowrap;">선택됨</span>`
+    : "";
+  return `<div style="background:${background};color:#fff;padding:2px 6px;border-radius:4px;font-size:12px;white-space:nowrap;transition:transform .15s ease;${highlight}">${badge}${item.price.toLocaleString("ko-KR")}원</div>`;
 }
 
 export function PharmacyMap({
