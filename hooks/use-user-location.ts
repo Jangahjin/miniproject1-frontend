@@ -19,11 +19,12 @@ export function useUserLocation() {
   const location = useSelector((state: RootState) => state.location);
   const dispatch = useDispatch();
 
-  // 앱 시작 시 이전에 고른 위치를 세션 스토리지에서 복원한다.
+  // 탭을 닫았다 다시 열어도 위치가 유지되도록 로컬 스토리지에서 복원한다
+  // (세션 스토리지는 탭이 닫히면 사라져 매번 위치 권한을 다시 물어봐야 했다).
   useEffect(() => {
     if (location.status !== "idle") return;
     try {
-      const raw = sessionStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         dispatch(rehydrate(JSON.parse(raw) as LocationState));
       }
@@ -35,7 +36,7 @@ export function useUserLocation() {
 
   const persist = useCallback((state: LocationState) => {
     try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch {
       // 저장 실패는 무시한다 — 위치 기능 자체는 이번 세션 동안 계속 동작한다.
     }
