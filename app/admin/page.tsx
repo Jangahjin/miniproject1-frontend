@@ -72,9 +72,14 @@ export default function AdminDashboardPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">관리자 대시보드</h1>
-        <Link href="/admin/reports" className="text-sm font-medium text-blue-600 hover:underline">
-          이상치 제보 관리 →
-        </Link>
+        <div className="flex gap-4">
+          <Link href="/admin/stats" className="text-sm font-medium text-blue-600 hover:underline">
+            통계 상세 →
+          </Link>
+          <Link href="/admin/reports" className="text-sm font-medium text-blue-600 hover:underline">
+            이상치 제보 관리 →
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
