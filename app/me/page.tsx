@@ -1,6 +1,7 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { getErrorMessage } from "@/lib/error-message";
@@ -8,6 +9,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { PriceTag } from "@/components/ui/PriceTag";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 // docs/API.md §2 GET /auth/me 응답 형태.
 interface MeResponse {
@@ -50,6 +52,11 @@ function statusBadgeFor(report: PriceReportListItem) {
 }
 
 export default function MyReportsPage() {
+  const queryClient = useQueryClient();
+  const [deleteTarget, setDeleteTarget] = useState<PriceReportListItem | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const meQuery = useQuery({
     queryKey: ["me"],
     queryFn: () => apiFetch<MeResponse>("/api/v1/auth/me", { auth: true }),
@@ -60,9 +67,33 @@ export default function MyReportsPage() {
       apiFetch<PriceReportListResponse>("/api/v1/price-reports?mine=true&size=50", { auth: true }),
   });
 
+  async function handleDelete(report: PriceReportListItem) {
+    if (isDeleting) return;
+    setDeleteError(null);
+    setIsDeleting(true);
+    try {
+      await apiFetch(`/api/v1/price-reports/${report.id}`, { method: "DELETE", auth: true });
+      setDeleteTarget(null);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["price-reports", "mine"] }),
+        queryClient.invalidateQueries({ queryKey: ["me"] }),
+      ]);
+    } catch (error) {
+      setDeleteError(getErrorMessage(error, "삭제에 실패했습니다."));
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       <h1 className="text-xl font-bold text-gray-900">내 제보</h1>
+
+      {deleteError && (
+        <p role="alert" className="text-sm text-red-600">
+          {deleteError}
+        </p>
+      )}
 
       <section className="rounded-xl border border-gray-200 bg-white p-4">
         {meQuery.isLoading ? (
@@ -113,12 +144,32 @@ export default function MyReportsPage() {
                   <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${badge.className}`}>
                     {badge.label}
                   </span>
+                  <button
+                    type="button"
+                    onClick={() => setDeleteTarget(report)}
+                    className="text-xs font-medium text-red-600 hover:text-red-700"
+                  >
+                    삭제
+                  </button>
                 </div>
               </li>
             );
           })}
         </ul>
       )}
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="제보를 삭제할까요?"
+        message={
+          deleteTarget
+            ? `${deleteTarget.pharmacy.name}의 ${deleteTarget.drug.displayName} 제보(${deleteTarget.price.toLocaleString("ko-KR")}원)를 삭제합니다. 통계에서 즉시 제외되며 되돌릴 수 없습니다.`
+            : ""
+        }
+        confirmLabel="삭제"
+        onConfirm={() => deleteTarget && handleDelete(deleteTarget)}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }
