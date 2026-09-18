@@ -161,7 +161,10 @@ export function PharmacyMap({
   }, [selectedId, sdkReady]);
 
   // API 키가 없거나 SDK 로드에 실패해도 리스트는 그대로 동작해야 한다 (T-22 완료 판정).
-  // 빈 박스만 남기지 않고, 이 영역이 무엇인지 안내한다.
+  // 빈 박스만 남기지 않고, 이 영역이 무엇인지 안내한다. 키 미설정과 SDK 로드 실패(주로
+  // 카카오 개발자 콘솔에 현재 도메인이 플랫폼으로 등록되지 않은 경우)는 원인이 다르므로
+  // 문구를 구분해서 보여준다 — 그래야 "키를 넣었는데도 지도가 안 뜬다"는 문의에서
+  // 바로 원인을 좁힐 수 있다.
   if (!hasApiKey || sdkFailed) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-1 bg-gray-50 px-4 text-center text-gray-400">
@@ -170,7 +173,9 @@ export function PharmacyMap({
         </span>
         <span className="text-sm font-medium">지도 영역</span>
         <span className="text-xs">
-          카카오맵 API 키를 설정하면 이 자리에 약국 위치가 표시됩니다
+          {sdkFailed
+            ? "카카오맵을 불러오지 못했습니다 — 카카오 개발자 콘솔에 현재 접속 도메인이 Web 플랫폼으로 등록돼 있는지 확인하세요 (README 트러블슈팅 참고)"
+            : "카카오맵 API 키를 설정하면 이 자리에 약국 위치가 표시됩니다"}
         </span>
       </div>
     );

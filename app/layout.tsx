@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
-import { NoticeBanner } from "@/components/ui/NoticeBanner";
 import { LocationIndicator } from "@/components/location-indicator";
 import { AuthStatus } from "@/components/auth-status";
 import { Providers } from "./providers";
@@ -40,14 +39,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 <AuthStatus />
               </div>
             </div>
-            <NoticeBanner />
           </header>
           <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-8">
             {children}
           </main>
-          <footer className="border-t border-gray-200 bg-white">
-            <NoticeBanner />
-          </footer>
         </Providers>
       </body>
     </html>
