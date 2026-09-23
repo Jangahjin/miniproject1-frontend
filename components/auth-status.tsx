@@ -11,7 +11,7 @@ export function AuthStatus() {
 
   if (!user) {
     return (
-      <Link href="/login" className="font-medium text-blue-600 hover:underline">
+      <Link href="/login" className="font-medium text-blue-600 hover:underline dark:text-blue-400">
         로그인
       </Link>
     );
@@ -20,17 +20,17 @@ export function AuthStatus() {
   return (
     <span className="flex items-center gap-2">
       {user.role === "ADMIN" && (
-        <Link href="/admin" className="font-medium text-gray-500 hover:text-gray-700 hover:underline">
+        <Link href="/admin" className="font-medium text-gray-500 hover:text-gray-700 hover:underline dark:text-gray-400 dark:hover:text-gray-200">
           관리자
         </Link>
       )}
-      <Link href="/me" className="hover:underline">
+      <Link href="/me" className="hover:underline dark:text-gray-300">
         {user.nickname}님
       </Link>
       <button
         type="button"
         onClick={() => dispatch(logout())}
-        className="text-gray-500 hover:text-gray-700 hover:underline"
+        className="text-gray-500 hover:text-gray-700 hover:underline dark:text-gray-400 dark:hover:text-gray-200"
       >
         로그아웃
       </button>

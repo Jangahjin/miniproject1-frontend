@@ -41,11 +41,11 @@ export function ReceiptThumbnail({ fileId }: { fileId: number }) {
   }, [fileId]);
 
   if (failed) {
-    return <span className="text-xs text-gray-400">영수증 로드 실패</span>;
+    return <span className="text-xs text-gray-400 dark:text-gray-500">영수증 로드 실패</span>;
   }
   if (!url) {
-    return <div className="h-12 w-12 shrink-0 animate-pulse rounded-lg bg-gray-200" aria-hidden="true" />;
+    return <div className="h-12 w-12 shrink-0 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700" aria-hidden="true" />;
   }
   // eslint-disable-next-line @next/next/no-img-element -- blob: object URL이라 next/image 최적화 대상이 아니다
-  return <img src={url} alt="영수증" className="h-12 w-12 shrink-0 rounded-lg border border-gray-200 object-cover" />;
+  return <img src={url} alt="영수증" className="h-12 w-12 shrink-0 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />;
 }

@@ -223,7 +223,7 @@ function ReportForm() {
 
   if (success && !warning) {
     return (
-      <p role="status" className="py-16 text-center text-sm text-gray-600">
+      <p role="status" className="py-16 text-center text-sm text-gray-600 dark:text-gray-300">
         제보 감사합니다! 잠시 후 약국 상세로 이동합니다.
       </p>
     );
@@ -231,17 +231,17 @@ function ReportForm() {
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-      <h1 className="text-xl font-bold text-gray-900">가격 제보하기</h1>
+      <h1 className="text-2xl font-black text-gray-950 dark:text-gray-50">가격 제보하기</h1>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-sm font-semibold text-gray-700">약국</h2>
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">약국</h2>
         {draft.pharmacyName ? (
-          <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4">
-            <span className="font-medium text-gray-900">{draft.pharmacyName}</span>
+          <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+            <span className="font-medium text-gray-900 dark:text-gray-100">{draft.pharmacyName}</span>
             <button
               type="button"
               onClick={() => updateDraft({ pharmacyId: null, pharmacyName: "" })}
-              className="text-sm font-medium text-blue-600 hover:underline"
+              className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
             >
               변경
             </button>
@@ -256,16 +256,16 @@ function ReportForm() {
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-sm font-semibold text-gray-700">약품</h2>
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">약품</h2>
         {draft.drugName ? (
-          <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4">
-            <span className="font-medium text-gray-900">
-              {draft.drugName} <span className="text-sm font-normal text-gray-500">({draft.packageUnit})</span>
+          <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+            <span className="font-medium text-gray-900 dark:text-gray-100">
+              {draft.drugName} <span className="text-sm font-normal text-gray-500 dark:text-gray-400">({draft.packageUnit})</span>
             </span>
             <button
               type="button"
               onClick={() => updateDraft({ drugId: null, drugName: "", packageUnit: "" })}
-              className="text-sm font-medium text-blue-600 hover:underline"
+              className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
             >
               변경
             </button>
@@ -409,7 +409,7 @@ function ReportForm() {
       <button
         type="submit"
         disabled={isSubmitting || isUploadingReceipt}
-        className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+        className="rounded-none border-2 border-gray-950 bg-gray-950 px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white shadow-[3px_3px_0_0_#2563eb] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_#2563eb] active:translate-x-0 active:translate-y-0 active:shadow-[1px_1px_0_0_#2563eb] disabled:pointer-events-none disabled:opacity-50"
       >
         {isSubmitting ? "제보 중..." : "제보하기"}
       </button>

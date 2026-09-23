@@ -50,12 +50,13 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-sm flex-col gap-6">
-      <h1 className="text-center text-xl font-bold text-gray-900">회원가입</h1>
+    <div className="flex flex-1 flex-col items-center justify-center py-8">
+    <div className="mx-auto flex w-full max-w-sm flex-col gap-6 rounded-none border-2 border-gray-950 bg-white p-8 dark:border-gray-50 dark:bg-gray-900">
+      <h1 className="text-center text-xl font-black text-gray-950 dark:text-gray-50">회원가입</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <label htmlFor="email" className="text-sm font-medium text-gray-700">
+          <label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
             이메일
           </label>
           <input
@@ -65,17 +66,17 @@ export default function SignupPage() {
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? "email-error" : undefined}
             {...register("email")}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
           />
           {errors.email && (
-            <p id="email-error" role="alert" className="text-xs text-red-600">
+            <p id="email-error" role="alert" className="text-xs text-red-600 dark:text-red-400">
               {errors.email.message}
             </p>
           )}
         </div>
 
         <div className="flex flex-col gap-1">
-          <label htmlFor="password" className="text-sm font-medium text-gray-700">
+          <label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
             비밀번호
           </label>
           <input
@@ -85,20 +86,20 @@ export default function SignupPage() {
             aria-invalid={!!errors.password}
             aria-describedby={errors.password ? "password-hint password-error" : "password-hint"}
             {...register("password")}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
           />
-          <p id="password-hint" className="text-xs text-gray-400">
+          <p id="password-hint" className="text-xs text-gray-400 dark:text-gray-500">
             8~64자, 영문과 숫자를 모두 포함해야 합니다.
           </p>
           {errors.password && (
-            <p id="password-error" role="alert" className="text-xs text-red-600">
+            <p id="password-error" role="alert" className="text-xs text-red-600 dark:text-red-400">
               {errors.password.message}
             </p>
           )}
         </div>
 
         <div className="flex flex-col gap-1">
-          <label htmlFor="nickname" className="text-sm font-medium text-gray-700">
+          <label htmlFor="nickname" className="text-sm font-medium text-gray-700 dark:text-gray-300">
             닉네임
           </label>
           <input
@@ -108,17 +109,17 @@ export default function SignupPage() {
             aria-invalid={!!errors.nickname}
             aria-describedby={errors.nickname ? "nickname-error" : undefined}
             {...register("nickname")}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
           />
           {errors.nickname && (
-            <p id="nickname-error" role="alert" className="text-xs text-red-600">
+            <p id="nickname-error" role="alert" className="text-xs text-red-600 dark:text-red-400">
               {errors.nickname.message}
             </p>
           )}
         </div>
 
         {errors.root && (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-red-600 dark:text-red-400">
             {errors.root.message}
           </p>
         )}
@@ -126,18 +127,19 @@ export default function SignupPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+          className="rounded-none border-2 border-gray-950 bg-gray-950 px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white shadow-[3px_3px_0_0_#2563eb] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_#2563eb] active:translate-x-0 active:translate-y-0 active:shadow-[1px_1px_0_0_#2563eb] disabled:pointer-events-none disabled:opacity-50 dark:border-gray-50 dark:bg-gray-50 dark:text-gray-950 dark:shadow-[3px_3px_0_0_#60a5fa] dark:hover:shadow-[5px_5px_0_0_#60a5fa] dark:active:shadow-[1px_1px_0_0_#60a5fa]"
         >
           {isSubmitting ? "가입하는 중..." : "가입하기"}
         </button>
       </form>
 
-      <p className="text-center text-sm text-gray-500">
+      <p className="text-center text-sm text-gray-500 dark:text-gray-400">
         이미 계정이 있으신가요?{" "}
-        <Link href="/login" className="font-medium text-blue-600 hover:underline">
+        <Link href="/login" className="font-medium text-blue-600 hover:underline dark:text-blue-400">
           로그인
         </Link>
       </p>
+    </div>
     </div>
   );
 }
