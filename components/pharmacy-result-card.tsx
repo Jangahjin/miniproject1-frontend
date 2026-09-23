@@ -75,8 +75,21 @@ export function PharmacyResultCard({
         <DistanceBadge meters={item.distanceM} />
         <span>제보 {item.price.reportCount}건 · {formatRelativeDate(item.price.lastReportedAt)} 갱신</span>
       </p>
-      {item.price.savingVsCandidateAvg > 0 && (
-        <p className="text-xs font-medium text-blue-600 dark:text-blue-400">평균보다 {item.price.savingVsCandidateAvg}원 저렴</p>
+      {/* savingVsCandidateAvg = candidateAvgPrice - repPrice — 이번 검색 결과 후보들의 평균가 대비
+          이 약국이 얼마나 싸거나 비싼지. 이전엔 저렴할 때만 보여주고 비쌀 땐 아무 표시가 없어
+          정보가 비대칭이었다 — 방향과 무관하게 항상 보여준다. */}
+      {item.price.savingVsCandidateAvg !== 0 && (
+        <p
+          className={`text-xs font-medium ${
+            item.price.savingVsCandidateAvg > 0
+              ? "text-blue-600 dark:text-blue-400"
+              : "text-gray-500 dark:text-gray-400"
+          }`}
+        >
+          {item.price.savingVsCandidateAvg > 0
+            ? `평균보다 ${item.price.savingVsCandidateAvg}원 저렴`
+            : `평균보다 ${Math.abs(item.price.savingVsCandidateAvg)}원 비쌈`}
+        </p>
       )}
       {item.badges.length > 0 && (
         <div className="flex flex-wrap gap-1 pt-1">
