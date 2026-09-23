@@ -58,10 +58,22 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const sort = VALID_SORT.includes(String(params.sort)) ? String(params.sort) : "SCORE";
 
   if (!drugId || (!(lat && lng) && !regionCode)) {
+    // not-found.tsx와 같은 톤(각진 테두리 버튼·중앙 정렬 스택)으로 맞춰,
+    // 홈에서 검색을 거치지 않고 주소를 직접 조작해 들어왔을 때도 사이트의
+    // 다른 실패 상태와 이질감이 없게 한다.
     return (
-      <p role="alert" className="py-16 text-center text-sm text-red-600 dark:text-red-400">
-        약품과 위치 정보가 필요합니다.
-      </p>
+      <div role="alert" className="flex flex-1 flex-col items-center justify-center gap-4 py-24 text-center">
+        <h1 className="text-xl font-black text-gray-950 dark:text-gray-50">검색 정보가 부족해요</h1>
+        <p className="max-w-xs text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+          약 이름과 위치 정보가 있어야 검색할 수 있어요. 홈에서 다시 약을 검색해보세요.
+        </p>
+        <Link
+          href="/"
+          className="mt-2 rounded-none border-2 border-gray-950 bg-gray-950 px-5 py-2.5 text-sm font-semibold uppercase tracking-wide text-white hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 dark:border-gray-50 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200"
+        >
+          홈으로 가기
+        </Link>
+      </div>
     );
   }
 
