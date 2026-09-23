@@ -9,7 +9,10 @@ export async function POST() {
   const refreshToken = cookieStore.get(REFRESH_TOKEN_COOKIE)?.value;
 
   if (!refreshToken) {
-    return NextResponse.json({ code: "UNAUTHENTICATED", message: "로그인이 필요합니다." }, { status: 401 });
+    // 로그인한 적 없는 방문자에게는 이 요청이 홈 진입 시마다 항상 나가는 정상
+    // 흐름이다(AuthBootstrap 참고) — 401을 쓰면 모든 익명 사용자의 콘솔에 매번
+    // 에러가 찍히므로, "세션 없음"은 실패가 아닌 성공 응답(빈 세션)으로 알린다.
+    return NextResponse.json({ accessToken: null, expiresIn: null, user: null });
   }
 
   const backendRes = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {

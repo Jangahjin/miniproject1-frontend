@@ -70,6 +70,9 @@ async function tryRefreshAccessToken(): Promise<boolean> {
     const res = await fetch("/api/auth/refresh", { method: "POST" });
     if (!res.ok) return false;
     const data = await res.json();
+    // 세션 쿠키가 아예 없는 경우도 이제 200 + accessToken: null로 내려온다
+    // (app/api/auth/refresh/route.ts) — 실제로 토큰을 받았을 때만 갱신 성공으로 본다.
+    if (!data.accessToken) return false;
     const { store } = await import("@/store");
     const { setSession } = await import("@/store/slices/auth-slice");
     store.dispatch(setSession({ accessToken: data.accessToken, user: data.user }));

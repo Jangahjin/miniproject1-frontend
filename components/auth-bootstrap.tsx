@@ -17,7 +17,9 @@ export function AuthBootstrap() {
     fetch("/api/auth/refresh", { method: "POST" })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data) dispatch(setSession({ accessToken: data.accessToken, user: data.user }));
+        // 세션이 없는 익명 방문자에게도 이제 200과 accessToken: null이 내려오므로
+        // (app/api/auth/refresh/route.ts), 값이 실제로 있을 때만 세션을 채운다.
+        if (data?.accessToken) dispatch(setSession({ accessToken: data.accessToken, user: data.user }));
       })
       .catch(() => {
         // 세션 복원 실패는 조용히 무시한다.
