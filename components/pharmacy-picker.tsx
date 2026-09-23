@@ -41,15 +41,15 @@ export function PharmacyPicker({
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder="약국명을 검색하세요"
-        className="w-full rounded-xl border border-gray-300 px-4 py-3 text-base shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:ring-blue-900"
       />
       {isFetching && (
-        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400 dark:text-gray-500">
           검색 중...
         </span>
       )}
       {results.length > 0 && (
-        <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white text-left shadow-lg">
+        <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white text-left shadow-lg dark:border-gray-700 dark:bg-gray-900">
           {results.map((pharmacy) => (
             <li key={pharmacy.id}>
               <button
@@ -58,10 +58,10 @@ export function PharmacyPicker({
                   onSelect(pharmacy);
                   setQuery("");
                 }}
-                className="block w-full px-4 py-2 text-left text-sm hover:bg-blue-50"
+                className="block w-full px-4 py-2 text-left text-sm hover:bg-blue-50 dark:hover:bg-gray-800"
               >
-                <span className="font-medium text-gray-900">{pharmacy.name}</span>{" "}
-                <span className="text-gray-500">{pharmacy.addressRoad}</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100">{pharmacy.name}</span>{" "}
+                <span className="text-gray-500 dark:text-gray-400">{pharmacy.addressRoad}</span>
               </button>
             </li>
           ))}

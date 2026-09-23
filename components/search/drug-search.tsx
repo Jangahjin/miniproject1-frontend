@@ -37,22 +37,27 @@ export function DrugSearch() {
       <DrugAutocomplete value={query} onChange={setQuery} onSelect={handleSelect} />
 
       {locationError && (
-        <p role="alert" className="text-center text-xs text-red-600">
+        <p role="alert" className="text-center text-xs text-red-400">
           위치 정보를 가져오지 못했습니다. 상단의 위치 설정에서 지역을 선택해주세요.
         </p>
       )}
 
-      <div className="flex flex-wrap justify-center gap-2">
-        {POPULAR_DRUGS.map((name) => (
-          <button
-            key={name}
-            type="button"
-            onClick={() => setQuery(name)}
-            className="rounded-full border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700 hover:border-blue-400 hover:text-blue-600"
-          >
-            {name}
-          </button>
-        ))}
+      {/* 이 컴포넌트는 항상 남색/검정 히어로 배경 위에 놓이므로(라이트·다크 사이트
+          테마와 무관), dark: 변형 대신 배경에 맞는 밝은 톤을 고정으로 쓴다. */}
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-sky-400/80">인기 검색어</p>
+        <div className="flex flex-wrap justify-center gap-2">
+          {POPULAR_DRUGS.map((name) => (
+            <button
+              key={name}
+              type="button"
+              onClick={() => setQuery(name)}
+              className="rounded-none border border-white/30 bg-white/10 px-3 py-1 text-sm text-white hover:border-sky-400 hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+            >
+              {name}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -49,12 +49,12 @@ function groupByCategory(drugPrices: DrugPrice[]): [string, DrugPrice[]][] {
 // 등락률처럼 보이는 "+140원/-81원" 표기 대신 문장으로 풀어 쓴다.
 function describeDiff(diff: number) {
   if (diff < 0) {
-    return { text: `전국 평균보다 ${Math.abs(diff).toLocaleString("ko-KR")}원 저렴`, tone: "text-green-600" };
+    return { text: `전국 평균보다 ${Math.abs(diff).toLocaleString("ko-KR")}원 저렴`, tone: "text-green-600 dark:text-green-400" };
   }
   if (diff > 0) {
-    return { text: `전국 평균보다 ${diff.toLocaleString("ko-KR")}원 비쌈`, tone: "text-gray-500" };
+    return { text: `전국 평균보다 ${diff.toLocaleString("ko-KR")}원 비쌈`, tone: "text-gray-500 dark:text-gray-400" };
   }
-  return { text: "전국 평균과 동일", tone: "text-gray-400" };
+  return { text: "전국 평균과 동일", tone: "text-gray-500 dark:text-gray-400" };
 }
 
 export function PharmacyDrugPrices({
@@ -75,14 +75,14 @@ export function PharmacyDrugPrices({
 
   return (
     <div className="flex flex-col gap-4">
-      <nav className="-mx-4 flex gap-5 overflow-x-auto border-b border-gray-200 px-4 text-sm">
+      <nav className="-mx-4 flex gap-5 overflow-x-auto border-b border-gray-200 px-4 text-sm dark:border-gray-800">
         <button
           type="button"
           onClick={() => setActiveTab("전체")}
           className={`shrink-0 whitespace-nowrap pb-2 ${
             activeTab === "전체"
-              ? "border-b-2 border-blue-600 font-semibold text-blue-600"
-              : "text-gray-400 hover:text-gray-600"
+              ? "border-b-2 border-blue-600 font-semibold text-blue-600 dark:border-blue-400 dark:text-blue-400"
+              : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           }`}
         >
           전체
@@ -94,8 +94,8 @@ export function PharmacyDrugPrices({
             onClick={() => setActiveTab(category)}
             className={`shrink-0 whitespace-nowrap pb-2 ${
               activeTab === category
-                ? "border-b-2 border-blue-600 font-semibold text-blue-600"
-                : "text-gray-400 hover:text-gray-600"
+                ? "border-b-2 border-blue-600 font-semibold text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             }`}
           >
             {category}
@@ -105,12 +105,12 @@ export function PharmacyDrugPrices({
 
       {visibleGroups.map(([category, drugs]) => (
         <section key={category}>
-          <h3 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+          <h3 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-gray-700 dark:text-gray-200">
             <span aria-hidden="true">{CATEGORY_ICON[category] ?? "💊"}</span>
             {category}
-            <span className="font-normal text-gray-400">{drugs.length}종</span>
+            <span className="font-normal text-gray-500 dark:text-gray-400">{drugs.length}종</span>
           </h3>
-          <ul className="divide-y divide-gray-100 rounded-lg border border-gray-100">
+          <ul className="divide-y divide-gray-100 rounded-lg border border-gray-100 dark:divide-gray-800 dark:border-gray-800">
             {drugs.map((drug) => {
               const diff = describeDiff(drug.diffFromNationalAvg);
               const expanded = expandedDrugId === drug.drugId;
@@ -122,8 +122,8 @@ export function PharmacyDrugPrices({
                     className="flex w-full items-start justify-between gap-4 text-left"
                   >
                     <div>
-                      <p className="font-medium text-gray-900">{drug.displayName}</p>
-                      <p className="text-xs text-gray-500">{drug.packageUnit}</p>
+                      <p className="font-medium text-gray-900 dark:text-gray-100">{drug.displayName}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{drug.packageUnit}</p>
                     </div>
                     <div className="shrink-0 text-right">
                       <p className="text-base">
@@ -132,11 +132,11 @@ export function PharmacyDrugPrices({
                       <p className={`text-xs ${diff.tone}`}>{diff.text}</p>
                     </div>
                   </button>
-                  <p className="mt-1.5 text-xs text-gray-400">
+                  <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                     제보 {drug.reportCount}건 · {formatRelativeDate(drug.lastReportedAt)} 갱신
                   </p>
                   {expanded && (
-                    <div className="mt-3 rounded-lg bg-gray-50 p-3">
+                    <div className="mt-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
                       <PriceHistoryChart pharmacyId={pharmacyId} drugId={drug.drugId} />
                     </div>
                   )}

@@ -54,17 +54,17 @@ export function PriceHistoryChart({ pharmacyId, drugId }: { pharmacyId: number; 
       apiFetch<PriceHistoryResponse>(`/api/v1/pharmacies/${pharmacyId}/drugs/${drugId}/history`),
   });
 
-  if (isLoading) return <p>이력 불러오는 중...</p>;
+  if (isLoading) return <p className="text-gray-600 dark:text-gray-300">이력 불러오는 중...</p>;
 
   const points = data?.points ?? [];
-  if (points.length === 0) return <p>가격 이력이 없습니다.</p>;
+  if (points.length === 0) return <p className="text-gray-600 dark:text-gray-300">가격 이력이 없습니다.</p>;
 
   return (
     <ResponsiveContainer width="100%" height={160}>
       <LineChart data={points}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="purchasedAt" />
-        <YAxis />
+        <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+        <XAxis dataKey="purchasedAt" className="fill-gray-500 dark:fill-gray-400" />
+        <YAxis className="fill-gray-500 dark:fill-gray-400" />
         <Tooltip
           formatter={(value, _name, item) => {
             const price = typeof value === "number" ? value : Number(value);

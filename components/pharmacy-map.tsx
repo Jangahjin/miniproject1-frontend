@@ -57,15 +57,16 @@ export interface MapMarkerData {
   rank: number;
 }
 
-// 선택된 마커는 노란 테두리 + 확대로 강조한다. 1위 색상(rank===1)과는 별개 축이라
-// "1위이면서 선택됨"도 동시에 표현된다.
+// 1위(최저가) 마커는 남색, 나머지는 검정에 가까운 회색으로 구분한다. 선택된 마커는
+// 하늘색 테두리 + 살짝 확대로 강조한다 — 1위 색상(rank===1)과는 별개 축이라
+// "1위이면서 선택됨"도 동시에 표현된다. (예전엔 scale(1.3)이라 반응이 과했다.)
 function buildOverlayHtml(item: MapMarkerData, isSelected: boolean): string {
-  const background = item.rank === 1 ? "#2563eb" : "#111827";
+  const background = item.rank === 1 ? "#172554" : "#111827";
   const highlight = isSelected
-    ? "box-shadow:0 0 0 3px #facc15;transform:scale(1.3);z-index:10;position:relative;animation:pharmacy-marker-selected-pulse 1.2s ease-in-out infinite;"
+    ? "box-shadow:0 0 0 2px #0ea5e9;transform:scale(1.12);z-index:10;position:relative;animation:pharmacy-marker-selected-pulse 1.2s ease-in-out infinite;"
     : "";
   const badge = isSelected
-    ? `<span style="position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:4px;background:#facc15;color:#111827;padding:1px 6px;border-radius:9999px;font-size:10px;font-weight:700;white-space:nowrap;">선택됨</span>`
+    ? `<span style="position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:4px;background:#0ea5e9;color:#ffffff;padding:1px 6px;border-radius:9999px;font-size:10px;font-weight:700;white-space:nowrap;">선택됨</span>`
     : "";
   return `<div style="background:${background};color:#fff;padding:2px 6px;border-radius:4px;font-size:12px;white-space:nowrap;transition:transform .15s ease;${highlight}">${badge}${item.price.toLocaleString("ko-KR")}원</div>`;
 }
@@ -170,7 +171,7 @@ export function PharmacyMap({
   // 바로 원인을 좁힐 수 있다.
   if (!hasApiKey || sdkFailed) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-1 bg-gray-50 px-4 text-center text-gray-400">
+      <div className="flex h-full flex-col items-center justify-center gap-1 bg-gray-50 px-4 text-center text-gray-400 dark:bg-gray-900 dark:text-gray-500">
         <span className="text-2xl" aria-hidden="true">
           🗺️
         </span>

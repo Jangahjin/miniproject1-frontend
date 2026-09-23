@@ -3,18 +3,36 @@
 import { useEffect, useState } from "react";
 
 // 실제 약국 사진은 DB에 없다(docs/DATABASE.md의 pharmacy 테이블에 이미지 컬럼이 없음).
-// 사진이 붙기 전까지 보여줄 디자인 플레이스홀더 슬라이드다.
+// 사진이 붙기 전까지 보여줄 자리표시자라 이 약국의 실제 모습이 아니다 — Pexels 무료
+// 스톡사진(출처 표시 불필요 라이선스)으로 채우고, "예시 이미지" 배지로 명확히 알린다.
 const SLIDES = [
-  { emoji: "🏥", label: "약국 외관", gradient: "from-blue-400 to-blue-600" },
-  { emoji: "💊", label: "조제실", gradient: "from-emerald-400 to-teal-600" },
-  { emoji: "🧴", label: "진열대", gradient: "from-amber-400 to-orange-500" },
-  { emoji: "🗺️", label: "찾아가는 길", gradient: "from-violet-400 to-purple-600" },
+  {
+    key: "exterior",
+    label: "약국 외관",
+    src: "https://images.pexels.com/photos/17003640/pexels-photo-17003640.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  },
+  {
+    key: "dispensary",
+    label: "조제실",
+    src: "https://images.pexels.com/photos/13119976/pexels-photo-13119976.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  },
+  {
+    key: "shelf",
+    label: "진열대",
+    src: "https://images.pexels.com/photos/6074000/pexels-photo-6074000.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  },
+  {
+    key: "directions",
+    label: "찾아가는 길",
+    src: "https://images.pexels.com/photos/8200445/pexels-photo-8200445.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  },
 ] as const;
 
 const AUTOPLAY_MS = 4000;
 
 export function PharmacyImageCarousel({ pharmacyName }: { pharmacyName: string }) {
   const [index, setIndex] = useState(0);
+  const [failed, setFailed] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -31,17 +49,23 @@ export function PharmacyImageCarousel({ pharmacyName }: { pharmacyName: string }
 
   return (
     <div className="relative overflow-hidden rounded-2xl shadow-sm">
-      <div
-        className={`flex h-48 items-center justify-center bg-gradient-to-br ${slide.gradient} text-white transition-colors duration-500 md:h-64`}
-      >
-        <div className="flex flex-col items-center gap-2">
-          <span className="text-6xl" aria-hidden="true">
-            {slide.emoji}
-          </span>
-          <span className="text-sm font-medium">
-            {pharmacyName} · {slide.label}
-          </span>
-        </div>
+      <div className="relative flex h-48 items-end bg-gray-200 text-white md:h-64 dark:bg-gray-800">
+        {failed[slide.key] ? (
+          <div className="flex h-full w-full items-center justify-center text-sm text-gray-400 dark:text-gray-500">
+            이미지를 불러오지 못했습니다
+          </div>
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element -- 외부 스톡사진 hotlink, next/image 최적화 불필요
+          <img
+            src={slide.src}
+            alt={`${pharmacyName} ${slide.label} 예시 이미지`}
+            className="absolute inset-0 h-full w-full object-cover"
+            onError={() => setFailed((prev) => ({ ...prev, [slide.key]: true }))}
+          />
+        )}
+        <span className="relative z-10 w-full bg-gradient-to-t from-black/60 to-transparent px-4 py-3 text-sm font-medium">
+          {pharmacyName} · {slide.label}
+        </span>
       </div>
 
       <button
@@ -61,10 +85,10 @@ export function PharmacyImageCarousel({ pharmacyName }: { pharmacyName: string }
         ›
       </button>
 
-      <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+      <div className="absolute bottom-14 left-1/2 flex -translate-x-1/2 gap-1.5 md:bottom-16">
         {SLIDES.map((s, i) => (
           <button
-            key={s.label}
+            key={s.key}
             type="button"
             aria-label={`${i + 1}번째 이미지로 이동`}
             aria-current={i === index}

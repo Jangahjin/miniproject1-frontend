@@ -5,7 +5,7 @@ import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 export default function SearchLoading() {
   return (
     <div className="flex flex-col gap-4">
-      <div className="h-6 w-48 animate-pulse rounded bg-gray-200" />
+      <div className="h-6 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-800" />
       <LoadingSkeleton />
     </div>
   );
