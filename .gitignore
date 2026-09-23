@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# playwright MCP 스크린샷/콘솔 로그 출력 (로컬 디버깅용, 저장소에 안 넣는다)
+.playwright-mcp/

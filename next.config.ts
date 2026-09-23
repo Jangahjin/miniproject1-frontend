@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+  // 화면 하단에 뜨는 Next.js 개발 모드 인디케이터(둥근 N 아이콘)를 끈다.
+  devIndicators: false,
 };
 
 export default nextConfig;

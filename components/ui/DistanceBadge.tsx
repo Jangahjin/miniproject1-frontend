@@ -2,7 +2,7 @@ import { formatDistance } from "@/lib/format";
 
 export function DistanceBadge({ meters }: { meters: number }) {
   return (
-    <span className="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+    <span className="inline-block rounded-sm border border-gray-300 px-1.5 py-0.5 font-serif text-xs font-medium tabular-nums text-gray-600 dark:border-gray-700 dark:text-gray-300">
       {formatDistance(meters)}
     </span>
   );
