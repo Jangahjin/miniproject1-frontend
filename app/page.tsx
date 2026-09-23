@@ -2,6 +2,7 @@ import Link from "next/link";
 import { DrugSearch } from "@/components/search/drug-search";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { HeroSlideshow } from "@/components/hero-slideshow";
+import { SiteIntro } from "@/components/site-intro";
 
 const STEPS = [
   { number: "01", title: "약 검색", description: "찾는 약 이름을 입력하면 근처 약국 목록이 바로 떠요." },
@@ -55,6 +56,7 @@ const MARQUEE_FULL = [...MARQUEE_HALF, ...MARQUEE_HALF];
 export default function Home() {
   return (
     <>
+      <SiteIntro />
       <div className="relative mx-[calc(50%-50vw)] w-screen overflow-hidden bg-blue-950 dark:bg-black">
         <HeroSlideshow />
         <div className="relative z-[2] mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 py-20 text-center sm:py-28">

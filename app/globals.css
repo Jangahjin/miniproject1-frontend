@@ -75,3 +75,27 @@ input:-webkit-autofill:focus {
     animation: none;
   }
 }
+
+/* 인트로 화면의 알약 아이콘이 한 번 통통 튀며 나타나는 연출 — 루프 없이 한 번만. */
+@keyframes intro-pill-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.6) rotate(-20deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.08) rotate(4deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+.intro-pill {
+  animation: intro-pill-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro-pill {
+    animation: none;
+  }
+}
