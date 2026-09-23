@@ -125,7 +125,7 @@ export function RegionStatsPanel() {
             setSido(event.target.value);
             setRegionCode("");
           }}
-          className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm"
+          className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
         >
           <option value="">전체 시도</option>
           {regionsQuery.data?.map((group) => (
@@ -139,7 +139,7 @@ export function RegionStatsPanel() {
           value={regionCode}
           onChange={(event) => setRegionCode(event.target.value)}
           disabled={!sido}
-          className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
+          className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:disabled:bg-gray-800 dark:disabled:text-gray-500"
         >
           <option value="">전체 시군구</option>
           {sigunguOptions.map((sigungu) => (
@@ -150,13 +150,13 @@ export function RegionStatsPanel() {
         </select>
 
         {selectedDrug ? (
-          <span className="flex items-center gap-1.5 rounded-full border border-blue-300 bg-blue-50 px-3 py-1 text-sm text-blue-700">
+          <span className="flex items-center gap-1.5 rounded-full border border-blue-300 bg-blue-50 px-3 py-1 text-sm text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300">
             {selectedDrug.displayName}
             <button
               type="button"
               onClick={() => setSelectedDrug(null)}
               aria-label="약품 필터 해제"
-              className="text-blue-400 hover:text-blue-600"
+              className="text-blue-400 hover:text-blue-600 dark:text-blue-500 dark:hover:text-blue-300"
             >
               ✕
             </button>
@@ -183,16 +183,16 @@ export function RegionStatsPanel() {
       ) : sortedRows.length === 0 ? (
         <EmptyState message="조건에 맞는 통계가 없습니다." />
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-gray-200">
+        <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
           <table className="w-full min-w-[640px] text-left text-sm">
-            <thead className="bg-gray-50 text-gray-500">
+            <thead className="bg-gray-50 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
               <tr>
                 {COLUMNS.map((column) => (
                   <th key={column.key} className="whitespace-nowrap px-3 py-2 font-medium">
                     <button
                       type="button"
                       onClick={() => toggleSort(column.key)}
-                      className="flex items-center gap-1 hover:text-gray-900"
+                      className="flex items-center gap-1 hover:text-gray-900 dark:hover:text-gray-100"
                     >
                       {column.label}
                       {sortKey === column.key && <span>{sortDir === "asc" ? "▲" : "▼"}</span>}
@@ -201,14 +201,14 @@ export function RegionStatsPanel() {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800 dark:bg-gray-900">
               {sortedRows.map((row, index) => (
-                <tr key={`${row.region.code}-${row.drug.id}-${index}`} className="text-gray-700">
+                <tr key={`${row.region.code}-${row.drug.id}-${index}`} className="text-gray-700 dark:text-gray-300">
                   <td className="whitespace-nowrap px-3 py-2">
                     {row.region.sido} {row.region.sigungu}
                   </td>
                   <td className="whitespace-nowrap px-3 py-2">{row.drug.displayName}</td>
-                  <td className="whitespace-nowrap px-3 py-2 font-medium text-gray-900">
+                  <td className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 dark:text-gray-100">
                     {formatPrice(row.avgPrice)}
                   </td>
                   <td className="whitespace-nowrap px-3 py-2">{formatPrice(row.minPrice)}</td>

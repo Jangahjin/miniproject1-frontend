@@ -33,15 +33,17 @@ interface AdminOverviewResponse {
 
 function KpiCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4">
-      <p className="text-xs text-gray-500">{label}</p>
-      <p className="mt-1 text-xl font-bold text-gray-900">{value}</p>
+    <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
+      <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
+      <p className="mt-1 text-xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
     </div>
   );
 }
 
 export default function AdminDashboardPage() {
   const router = useRouter();
+  const gridStroke = "#e5e7eb";
+  const tickColor = "#6b7280";
   const overviewQuery = useQuery({
     queryKey: ["admin", "overview"],
     queryFn: () => apiFetch<AdminOverviewResponse>("/api/v1/admin/stats/overview", { auth: true }),
@@ -71,12 +73,12 @@ export default function AdminDashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">관리자 대시보드</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">관리자 대시보드</h1>
         <div className="flex gap-4">
-          <Link href="/admin/stats" className="text-sm font-medium text-blue-600 hover:underline">
+          <Link href="/admin/stats" className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400">
             통계 상세 →
           </Link>
-          <Link href="/admin/reports" className="text-sm font-medium text-blue-600 hover:underline">
+          <Link href="/admin/reports" className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400">
             이상치 제보 관리 →
           </Link>
         </div>
@@ -90,14 +92,17 @@ export default function AdminDashboardPage() {
         <KpiCard label="이상치 제보" value={data.flaggedReportCount.toLocaleString("ko-KR")} />
       </div>
 
-      <section className="rounded-xl border border-gray-200 bg-white p-4">
-        <h2 className="mb-3 text-sm font-semibold text-gray-700">최근 7일 제보 추이</h2>
+      <section className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
+        <h2 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">최근 7일 제보 추이</h2>
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={data.recentTrend}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" tickFormatter={(value: string) => value.slice(5)} />
-            <YAxis allowDecimals={false} />
-            <Tooltip labelFormatter={(value) => `${value}`} formatter={(value) => [`${value}건`, "제보 수"]} />
+            <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
+            <XAxis dataKey="date" tickFormatter={(value: string) => value.slice(5)} tick={{ fill: tickColor, fontSize: 12 }} />
+            <YAxis allowDecimals={false} tick={{ fill: tickColor, fontSize: 12 }} />
+            <Tooltip
+              labelFormatter={(value) => `${value}`}
+              formatter={(value) => [`${value}건`, "제보 수"]}
+            />
             <Line type="monotone" dataKey="reportCount" stroke="#2563eb" strokeWidth={2} dot />
           </LineChart>
         </ResponsiveContainer>

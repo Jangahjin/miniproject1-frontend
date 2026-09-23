@@ -24,13 +24,13 @@ export default function AdminStatsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href="/admin" className="text-sm text-gray-500 hover:underline">
+        <Link href="/admin" className="text-sm text-gray-500 hover:underline dark:text-gray-400">
           ← 관리자 대시보드
         </Link>
-        <h1 className="mt-1 text-xl font-bold text-gray-900">관리자 통계</h1>
+        <h1 className="mt-1 text-xl font-bold text-gray-900 dark:text-gray-100">관리자 통계</h1>
       </div>
 
-      <nav className="-mx-4 flex gap-5 overflow-x-auto border-b border-gray-200 px-4 text-sm">
+      <nav className="-mx-4 flex gap-5 overflow-x-auto border-b border-gray-200 px-4 text-sm dark:border-gray-700">
         {TABS.map((tab) => (
           <button
             key={tab.key}
@@ -38,8 +38,8 @@ export default function AdminStatsPage() {
             onClick={() => setActiveTab(tab.key)}
             className={`shrink-0 whitespace-nowrap pb-2 ${
               activeTab === tab.key
-                ? "border-b-2 border-blue-600 font-semibold text-blue-600"
-                : "text-gray-400 hover:text-gray-600"
+                ? "border-b-2 border-blue-600 font-semibold text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                : "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
             }`}
           >
             {tab.label}

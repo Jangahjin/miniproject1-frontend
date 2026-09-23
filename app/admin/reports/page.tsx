@@ -100,9 +100,9 @@ export default function AdminReportsPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-bold text-gray-900">이상치 제보 관리</h1>
+      <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">이상치 제보 관리</h1>
       {actionError && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
           {actionError}
         </p>
       )}
@@ -110,7 +110,7 @@ export default function AdminReportsPage() {
       {reports.length === 0 ? (
         <EmptyState message="검토가 필요한 이상치 제보가 없습니다." />
       ) : (
-        <ul className="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white">
+        <ul className="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white dark:divide-gray-800 dark:border-gray-700 dark:bg-gray-900">
           {reports.map((report) => (
             <li
               key={report.id}
@@ -119,13 +119,13 @@ export default function AdminReportsPage() {
               <div className="flex items-center gap-3">
                 {report.receiptFileId != null && <ReceiptThumbnail fileId={report.receiptFileId} />}
                 <div>
-                  <p className="font-medium text-gray-900">
+                  <p className="font-medium text-gray-900 dark:text-gray-100">
                     {report.pharmacy.name} · {report.drug.displayName} ({report.drug.packageUnit})
                   </p>
                   <p className="text-sm">
-                    <PriceTag price={report.price} /> <span className="text-gray-400">· {report.purchasedAt} 구매</span>
+                    <PriceTag price={report.price} /> <span className="text-gray-400 dark:text-gray-500">· {report.purchasedAt} 구매</span>
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
                     제보자 {report.reporter?.nickname ?? "알 수 없음"} ({report.reporter?.email ?? "-"}) · 사유{" "}
                     {report.flagReason ?? "-"}
                   </p>
@@ -135,14 +135,14 @@ export default function AdminReportsPage() {
                 <button
                   type="button"
                   onClick={() => handleRestore(report)}
-                  className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                 >
                   복구
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmTarget(report)}
-                  className="rounded-lg border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
+                  className="rounded-lg border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
                 >
                   숨김
                 </button>
