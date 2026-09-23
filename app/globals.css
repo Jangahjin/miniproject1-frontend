@@ -1,22 +1,25 @@
 @import "tailwindcss";
 
+/* 시스템 설정(prefers-color-scheme) 대신 <html class="dark">로 다크모드를 수동 제어한다 —
+   헤더의 라이트/다크 토글 버튼과 localStorage 저장값이 이 클래스를 켜고 끈다. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0a0a0a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* 한글엔 글리프가 없어 숫자(가격 등) 전용으로만 쓴다 — PriceTag 참고. */
+  --font-serif: var(--font-fraunces);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  --background: #0a0a0a;
+  --foreground: #f5f5f5;
 }
 
 body {
@@ -25,13 +28,50 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* 지도에서 클릭한 약국 마커를 "내가 이걸 눌렀다"고 바로 알아보게 펄스로 강조한다. */
+/* 브라우저가 자동완성한 입력창은 크롬이 -webkit-box-shadow로 배경을 강제로 덮어써서
+   다크모드에서도 항상 밝은 색으로 보인다 — inset box-shadow 트릭으로 같이 덮어써야 한다. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #171717;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f3f4f6;
+  -webkit-box-shadow: 0 0 0px 1000px #111827 inset;
+}
+
+/* 지도에서 클릭한 약국 마커를 "내가 이걸 눌렀다"고 바로 알아보게 펄스로 강조한다.
+   하늘색(sky-500)을 골라, 1위 약국에 쓰는 남색(navy)과 뚜렷하게 구분되게 했다. */
 @keyframes pharmacy-marker-selected-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 3px #facc15, 0 0 0 3px #facc15;
+    box-shadow: 0 0 0 2px #0ea5e9, 0 0 0 2px #0ea5e9;
   }
   50% {
-    box-shadow: 0 0 0 3px #facc15, 0 0 10px 4px rgba(250, 204, 21, 0.75);
+    box-shadow: 0 0 0 2px #0ea5e9, 0 0 5px 2px rgba(14, 165, 233, 0.6);
+  }
+}
+
+/* 히어로 아래 흐르는 마퀴 띠 — 내용을 두 벌 이어 붙여 -50%까지만 이동시키면
+   이음매 없이 반복된다. 모션에 민감한 사용자를 위해 아래에서 정지시킨다. */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  animation: marquee-scroll 22s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
   }
 }
