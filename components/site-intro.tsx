@@ -137,7 +137,7 @@ export function SiteIntro() {
 
       <div className="flex flex-col items-center gap-4">
         <div className="flex flex-col items-center gap-2">
-          <p className="text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">약핏</p>
+          <p className="text-3xl font-extrabold tracking-[0.08em] sm:text-5xl">YAKFIT</p>
           <p className="text-sm text-[#C9D4E6] sm:text-base">약 이름으로 근처 최저가 약국을 찾아보세요</p>
         </div>
       </div>

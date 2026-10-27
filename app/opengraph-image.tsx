@@ -19,7 +19,7 @@ export default function OpengraphImage() {
           color: "#ffffff",
         }}
       >
-        <div style={{ display: "flex", fontSize: 96, fontWeight: 900 }}>약핏</div>
+        <div style={{ display: "flex", fontSize: 96, fontWeight: 900, letterSpacing: 6 }}>YAKFIT</div>
         <div style={{ display: "flex", fontSize: 32, color: "#C9D4E6" }}>
           약 이름으로 근처 최저가 약국을 찾아보세요
         </div>

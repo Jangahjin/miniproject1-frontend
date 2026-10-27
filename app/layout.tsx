@@ -38,12 +38,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {/* 예전의 굵은 검정 하단선(border-b-2) 대신 홈과 같은 얇은 line 색 테두리 + 반투명 블러. */}
           <header className="sticky top-0 z-10 border-b border-line bg-white/85 backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/85">
             <div className="mx-auto flex h-[62px] max-w-6xl items-center gap-3 px-4">
-              {/* 심볼·보조 영문 표기 없이 "약핏" 글자만 두는 깔끔한 워드마크. */}
+              {/* 심볼 없이 영문 "YAKFIT" 글자만 두는 깔끔한 워드마크. 대문자라 자간을 살짝 벌려 읽기 쉽게 한다. */}
               <Link
                 href="/"
-                className="rounded-control text-xl font-extrabold tracking-[-0.03em] text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand dark:text-gray-50"
+                aria-label="약핏 홈"
+                className="rounded-control text-lg font-extrabold tracking-[0.08em] text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand dark:text-gray-50"
               >
-                약핏
+                YAKFIT
               </Link>
               <div className="ml-auto flex items-center gap-2 text-sm">
                 <LocationIndicator />
@@ -59,7 +60,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <footer className="mx-[calc(50%-50vw)] w-screen border-t border-line bg-mist dark:border-gray-800 dark:bg-gray-950">
             <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex flex-col gap-3">
-                <span className="text-base font-extrabold tracking-[-0.03em] text-ink dark:text-gray-50">약핏</span>
+                <span className="text-base font-extrabold tracking-[0.08em] text-ink dark:text-gray-50">YAKFIT</span>
                 <p className="max-w-md text-[13px] leading-[1.7] text-sub dark:text-gray-400">
                   표시되는 가격은 이용자 제보와 수집 데이터를 바탕으로 한 참고 정보이며, 실제 판매가와 다를 수 있습니다. 정확한
                   가격과 재고는 방문 전 약국에 확인해주세요.
@@ -77,7 +78,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 </Link>
               </nav>
             </div>
-            <p className="border-t border-line py-4 text-center text-xs text-sub dark:border-gray-800 dark:text-gray-500">© 2026 약핏 YakFit</p>
+            <p className="border-t border-line py-4 text-center text-xs text-sub dark:border-gray-800 dark:text-gray-500">© 2026 YAKFIT</p>
           </footer>
         </Providers>
       </body>
