@@ -22,24 +22,26 @@ export default function AdminStatsPage() {
   // refresh token이 단발성(rotate)일 때 경쟁 상태로 401이 발생했다.
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 pb-16">
       <div>
-        <Link href="/admin" className="text-sm text-gray-500 hover:underline dark:text-gray-400">
+        <Link href="/admin" className="text-sm text-sub hover:text-brand dark:text-gray-400 dark:hover:text-sky-300">
           ← 관리자 대시보드
         </Link>
-        <h1 className="mt-1 text-xl font-bold text-gray-900 dark:text-gray-100">관리자 통계</h1>
+        <h1 className="mt-1 text-2xl font-extrabold tracking-[-0.02em] text-ink dark:text-gray-50">관리자 통계</h1>
       </div>
 
-      <nav className="-mx-4 flex gap-5 overflow-x-auto border-b border-gray-200 px-4 text-sm dark:border-gray-700">
+      {/* 구분선을 border 대신 inset 그림자로 그려야, 활성 탭 밑줄이 그 위에 겹쳐도 세로로 넘치지 않는다
+          (overflow-x-auto 컨테이너는 세로 넘침도 스크롤로 만들어 ▲▼ 화살표가 생겼다). */}
+      <nav className="flex gap-6 overflow-x-auto text-[15px] shadow-[inset_0_-1px_0_var(--color-line)] dark:shadow-[inset_0_-1px_0_#1f2937]">
         {TABS.map((tab) => (
           <button
             key={tab.key}
             type="button"
             onClick={() => setActiveTab(tab.key)}
-            className={`shrink-0 whitespace-nowrap pb-2 ${
+            className={`shrink-0 whitespace-nowrap border-b-2 pb-2.5 ${
               activeTab === tab.key
-                ? "border-b-2 border-brand font-semibold text-brand dark:border-sky-400 dark:text-sky-400"
-                : "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+                ? "border-brand font-bold text-brand dark:border-sky-400 dark:text-sky-400"
+                : "border-transparent font-semibold text-sub hover:text-ink dark:text-gray-500 dark:hover:text-gray-300"
             }`}
           >
             {tab.label}

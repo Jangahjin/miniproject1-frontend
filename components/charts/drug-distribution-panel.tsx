@@ -21,7 +21,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 
-const ACCENT = "#2563eb";
+const ACCENT = "#1F3C66";
 
 // docs/API.md §8 GET /admin/stats/drugs/{drugId} 응답 형태 (DrugStatsResponse.java와 대응).
 interface Bucket {
@@ -54,9 +54,9 @@ interface DrugStatsResponse {
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
-      <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
-      <p className="mt-1 text-lg font-bold text-gray-900 dark:text-gray-100">{value}</p>
+    <div className="card p-4">
+      <p className="text-xs font-semibold text-sub dark:text-gray-400">{label}</p>
+      <p className="mt-1 text-xl font-extrabold tracking-[-0.02em] text-ink tabular-nums dark:text-gray-100">{value}</p>
     </div>
   );
 }
@@ -81,13 +81,13 @@ export function DrugDistributionPanel() {
   return (
     <div className="flex flex-col gap-4">
       {selectedDrug ? (
-        <span className="flex w-fit items-center gap-1.5 rounded-full border border-blue-300 bg-blue-50 px-3 py-1 text-sm text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300">
+        <span className="flex w-fit items-center gap-1.5 rounded-full border border-brand/20 bg-brand-soft px-3 py-1 text-sm font-semibold text-brand dark:border-sky-400/30 dark:bg-sky-400/10 dark:text-sky-300">
           {selectedDrug.displayName} ({selectedDrug.packageUnit})
           <button
             type="button"
             onClick={() => setSelectedDrug(null)}
             aria-label="약품 선택 해제"
-            className="text-blue-400 hover:text-blue-600 dark:text-blue-500 dark:hover:text-blue-300"
+            className="text-brand/60 hover:text-brand dark:text-sky-400/60 dark:hover:text-sky-300"
           >
             ✕
           </button>
@@ -124,8 +124,8 @@ export function DrugDistributionPanel() {
             <StatCard label="표준편차" value={statsQuery.data.national.stdDev != null ? formatPrice(statsQuery.data.national.stdDev) : "-"} />
           </div>
 
-          <section className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
-            <h3 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">가격 분포</h3>
+          <section className="card p-5">
+            <h3 className="mb-3 text-sm font-bold text-ink dark:text-gray-200">가격 분포</h3>
             {statsQuery.data.distribution.length === 0 ? (
               <EmptyState message="가격 데이터가 없습니다." />
             ) : (
@@ -146,8 +146,8 @@ export function DrugDistributionPanel() {
             )}
           </section>
 
-          <section className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
-            <h3 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">지역별 평균가</h3>
+          <section className="card p-5">
+            <h3 className="mb-3 text-sm font-bold text-ink dark:text-gray-200">지역별 평균가</h3>
             {statsQuery.data.byRegion.length === 0 ? (
               <EmptyState message="지역별 데이터가 없습니다." />
             ) : (

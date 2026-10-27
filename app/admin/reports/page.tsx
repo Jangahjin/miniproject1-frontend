@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -20,12 +21,24 @@ interface AdminReportItem {
   price: number;
   purchasedAt: string;
   reporter: { id: number; nickname: string; email: string } | null;
+  source: "SEED" | "USER";
   flagReason: string | null;
   receiptFileId: number | null;
 }
 
 interface AdminReportListResponse {
   content: AdminReportItem[];
+  totalElements: number;
+}
+
+// 시드 제보는 제보자·사유가 원래 비어 있다(null) — "알 수 없음 (-) · 사유 -"처럼 빈 값을 대시로
+// 늘어놓는 대신, 출처를 밝히고 값이 있는 항목만 보여준다.
+function describeReport(report: AdminReportItem): string {
+  const parts: string[] = [];
+  if (report.reporter) parts.push(`제보자 ${report.reporter.nickname} (${report.reporter.email})`);
+  else parts.push(report.source === "SEED" ? "시드 데이터" : "제보자 정보 없음");
+  if (report.flagReason) parts.push(`사유 ${report.flagReason}`);
+  return parts.join(" · ");
 }
 
 export default function AdminReportsPage() {
@@ -97,10 +110,22 @@ export default function AdminReportsPage() {
   }
 
   const reports = reportsQuery.data?.content ?? [];
+  const total = reportsQuery.data?.totalElements ?? reports.length;
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">이상치 제보 관리</h1>
+    <div className="flex flex-col gap-5 pb-16">
+      <div className="flex flex-col gap-1">
+        <Link href="/admin" className="w-fit text-sm text-sub hover:text-brand dark:text-gray-400 dark:hover:text-sky-300">
+          ← 관리자 대시보드
+        </Link>
+        <h1 className="text-2xl font-extrabold tracking-[-0.02em] text-ink dark:text-gray-50">이상치 제보 관리</h1>
+        {reports.length > 0 && (
+          <p className="text-sm text-sub dark:text-gray-400">
+            검토 대기 <b className="font-bold text-ink tabular-nums dark:text-gray-100">{total.toLocaleString("ko-KR")}</b>건
+            {total > reports.length && ` 중 ${reports.length}건 표시`}
+          </p>
+        )}
+      </div>
       {actionError && (
         <p role="alert" className="text-sm text-red-600 dark:text-red-400">
           {actionError}
@@ -110,7 +135,7 @@ export default function AdminReportsPage() {
       {reports.length === 0 ? (
         <EmptyState message="검토가 필요한 이상치 제보가 없습니다." />
       ) : (
-        <ul className="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white dark:divide-gray-800 dark:border-gray-700 dark:bg-gray-900">
+        <ul className="card divide-y divide-line overflow-hidden dark:divide-gray-800">
           {reports.map((report) => (
             <li
               key={report.id}
@@ -119,16 +144,13 @@ export default function AdminReportsPage() {
               <div className="flex items-center gap-3">
                 {report.receiptFileId != null && <ReceiptThumbnail fileId={report.receiptFileId} />}
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-gray-100">
+                  <p className="font-bold text-ink dark:text-gray-100">
                     {report.pharmacy.name} · {report.drug.displayName} ({report.drug.packageUnit})
                   </p>
                   <p className="text-sm">
-                    <PriceTag price={report.price} /> <span className="text-gray-400 dark:text-gray-500">· {report.purchasedAt} 구매</span>
+                    <PriceTag price={report.price} /> <span className="text-sub dark:text-gray-400">· {report.purchasedAt} 구매</span>
                   </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">
-                    제보자 {report.reporter?.nickname ?? "알 수 없음"} ({report.reporter?.email ?? "-"}) · 사유{" "}
-                    {report.flagReason ?? "-"}
-                  </p>
+                  <p className="mt-0.5 text-xs text-sub dark:text-gray-500">{describeReport(report)}</p>
                 </div>
               </div>
               <div className="flex shrink-0 gap-2">
@@ -142,7 +164,8 @@ export default function AdminReportsPage() {
                 <button
                   type="button"
                   onClick={() => setConfirmTarget(report)}
-                  className="rounded-lg border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
+                  // 복구 버튼과 같은 크기(btn-secondary)에 위험 동작임을 빨간 톤으로만 구분한다.
+                  className="btn-secondary border-red-200 px-4 py-2 text-red-600 hover:border-red-400 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:text-red-400 dark:hover:border-red-700 dark:hover:bg-red-950 dark:hover:text-red-300"
                 >
                   숨김
                 </button>

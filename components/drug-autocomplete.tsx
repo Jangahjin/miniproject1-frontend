@@ -76,7 +76,7 @@ export function DrugAutocomplete({
       className={
         isHero
           ? "min-w-0 flex-1 border-none bg-transparent py-2.5 text-[15px] tracking-[-0.01em] text-gray-950 outline-none placeholder:text-gray-400"
-          : "input-field py-3"
+          : "input-field"
       }
     />
   );

@@ -48,22 +48,22 @@ export function PriceGapPanel() {
   const maxGapPct = Math.max(...rows.map((row) => row.gapPct));
 
   return (
-    <ul className="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white dark:divide-gray-800 dark:border-gray-700 dark:bg-gray-900">
+    <ul className="card divide-y divide-line overflow-hidden dark:divide-gray-800">
       {rows.map((row) => (
-        <li key={row.drug.id} className="flex flex-col gap-2 p-4">
+        <li key={row.drug.id} className="flex flex-col gap-2.5 px-5 py-4">
           <div className="flex items-center justify-between gap-2">
-            <p className="font-medium text-gray-900 dark:text-gray-100">{row.drug.displayName}</p>
-            <p className="shrink-0 text-sm font-semibold text-blue-600 dark:text-blue-400">{row.gapPct.toFixed(1)}%</p>
+            <p className="font-bold text-ink dark:text-gray-100">{row.drug.displayName}</p>
+            <p className="shrink-0 text-[15px] font-extrabold text-brand tabular-nums dark:text-sky-300">{row.gapPct.toFixed(1)}%</p>
           </div>
 
-          <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-mist dark:bg-gray-800">
             <div
-              className="h-full rounded-full bg-blue-600"
+              className="h-full rounded-full bg-brand dark:bg-sky-400"
               style={{ width: `${maxGapPct > 0 ? (row.gapPct / maxGapPct) * 100 : 0}%` }}
             />
           </div>
 
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-sub dark:text-gray-400">
             최저 {row.cheapestRegion.sido} {row.cheapestRegion.sigungu} ({formatPrice(row.cheapestRegion.avgPrice)}) →
             최고 {row.priciestRegion.sido} {row.priciestRegion.sigungu} ({formatPrice(row.priciestRegion.avgPrice)})
             <span className="text-gray-400 dark:text-gray-500"> · 격차 {formatPrice(row.gap)}</span>

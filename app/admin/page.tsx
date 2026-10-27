@@ -31,12 +31,23 @@ interface AdminOverviewResponse {
   coverageRate: number;
 }
 
-function KpiCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
-      <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
-      <p className="mt-1 text-xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
-    </div>
+// href가 있으면 카드 전체가 해당 화면으로 가는 링크가 된다 (예: 이상치 제보 → 검토 화면).
+// tone="alert"는 처리가 필요한 수치를 빨간 톤으로 구분한다.
+function KpiCard({ label, value, href, tone }: { label: string; value: string; href?: string; tone?: "alert" }) {
+  const body = (
+    <>
+      <p className={`text-xs font-semibold ${tone === "alert" ? "text-red-600 dark:text-red-400" : "text-sub dark:text-gray-400"}`}>{label}</p>
+      <p className="mt-1.5 text-2xl font-extrabold tracking-[-0.02em] text-ink tabular-nums dark:text-gray-50">{value}</p>
+      {href && <p className="mt-1 text-xs font-semibold text-brand dark:text-sky-300">검토하기 →</p>}
+    </>
+  );
+  const className = `card p-5 ${tone === "alert" ? "border-red-200 bg-red-50/50 dark:border-red-900/60 dark:bg-red-950/20" : ""}`;
+  return href ? (
+    <Link href={href} className={`${className} transition hover:-translate-y-0.5 hover:shadow-md`}>
+      {body}
+    </Link>
+  ) : (
+    <div className={className}>{body}</div>
   );
 }
 
@@ -71,9 +82,9 @@ export default function AdminDashboardPage() {
   if (!data) return null;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 pb-16">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">관리자 대시보드</h1>
+        <h1 className="text-2xl font-extrabold tracking-[-0.02em] text-ink dark:text-gray-50">관리자 대시보드</h1>
         <div className="flex gap-4">
           <Link href="/admin/stats" className="text-sm font-medium text-brand hover:underline dark:text-sky-400">
             통계 상세 →
@@ -89,11 +100,22 @@ export default function AdminDashboardPage() {
         <KpiCard label="약품 수" value={data.totals.drugCount.toLocaleString("ko-KR")} />
         <KpiCard label="제보 수" value={data.totals.reportCount.toLocaleString("ko-KR")} />
         <KpiCard label="커버리지" value={`${Math.round(data.coverageRate * 100)}%`} />
-        <KpiCard label="이상치 제보" value={data.flaggedReportCount.toLocaleString("ko-KR")} />
+        <KpiCard
+          label="이상치 제보"
+          value={data.flaggedReportCount.toLocaleString("ko-KR")}
+          href="/admin/reports"
+          tone={data.flaggedReportCount > 0 ? "alert" : undefined}
+        />
       </div>
 
-      <section className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
-        <h2 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">최근 7일 제보 추이</h2>
+      <section className="card relative p-5">
+        <h2 className="mb-3 text-sm font-bold text-ink dark:text-gray-200">최근 7일 제보 추이</h2>
+        {/* 전부 0이면 납작한 선만 보여 고장처럼 보이므로, 데이터가 없다는 사실을 글로 알려준다. */}
+        {data.recentTrend.every((day) => day.reportCount === 0) && (
+          <p className="pointer-events-none absolute inset-x-0 top-1/2 z-10 text-center text-sm text-sub dark:text-gray-400">
+            최근 7일간 새로 들어온 제보가 없습니다.
+          </p>
+        )}
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={data.recentTrend}>
             <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
@@ -103,7 +125,7 @@ export default function AdminDashboardPage() {
               labelFormatter={(value) => `${value}`}
               formatter={(value) => [`${value}건`, "제보 수"]}
             />
-            <Line type="monotone" dataKey="reportCount" stroke="#2563eb" strokeWidth={2} dot />
+            <Line type="monotone" dataKey="reportCount" stroke="#1F3C66" strokeWidth={2} dot />
           </LineChart>
         </ResponsiveContainer>
       </section>
