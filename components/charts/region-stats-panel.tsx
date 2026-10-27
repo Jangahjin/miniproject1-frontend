@@ -10,6 +10,7 @@ import { useAdminGuard } from "@/hooks/use-admin-guard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import { Pagination } from "@/components/ui/Pagination";
 
 // docs/API.md §7 GET /regions 응답 형태 (region-picker.tsx와 동일 엔드포인트).
 interface Sigungu {
@@ -38,16 +39,20 @@ interface RegionStatsResponse {
   rows: RegionStatsRow[];
 }
 
+// 전체 시도 기준이면 수백 행이 한 번에 깔려 스크롤이 끝없이 길어진다 — 20행씩 끊어 보여준다.
+const ROWS_PER_PAGE = 20;
+
 type SortKey = "region" | "drug" | "avgPrice" | "minPrice" | "maxPrice" | "pharmacyCount" | "reportCount";
 
-const COLUMNS: { key: SortKey; label: string }[] = [
+// numeric 열은 오른쪽 정렬 + 고정폭 숫자로 자릿수를 세로로 맞춰, 위아래 행의 크기 비교가 바로 되게 한다.
+const COLUMNS: { key: SortKey; label: string; numeric?: boolean }[] = [
   { key: "region", label: "지역" },
   { key: "drug", label: "약품" },
-  { key: "avgPrice", label: "평균가" },
-  { key: "minPrice", label: "최저가" },
-  { key: "maxPrice", label: "최고가" },
-  { key: "pharmacyCount", label: "약국수" },
-  { key: "reportCount", label: "제보수" },
+  { key: "avgPrice", label: "평균가", numeric: true },
+  { key: "minPrice", label: "최저가", numeric: true },
+  { key: "maxPrice", label: "최고가", numeric: true },
+  { key: "pharmacyCount", label: "약국수", numeric: true },
+  { key: "reportCount", label: "제보수", numeric: true },
 ];
 
 function sortValue(row: RegionStatsRow, key: SortKey): string | number {
@@ -105,6 +110,14 @@ export function RegionStatsPanel() {
     return sorted;
   }, [statsQuery.data, sortKey, sortDir]);
 
+  // 필터·정렬이 바뀌면 1페이지로 돌아가야 한다. effect로 setState하는 대신 "어떤 조건에서의
+  // 페이지 번호인지"를 함께 저장해 두고, 조건(pageKey)이 달라졌으면 0페이지로 본다.
+  const pageKey = `${sido}|${regionCode}|${selectedDrug?.id ?? ""}|${sortKey}|${sortDir}`;
+  const [pageState, setPageState] = useState({ key: pageKey, page: 0 });
+  const page = pageState.key === pageKey ? pageState.page : 0;
+  const totalPages = Math.ceil(sortedRows.length / ROWS_PER_PAGE);
+  const pageRows = sortedRows.slice(page * ROWS_PER_PAGE, (page + 1) * ROWS_PER_PAGE);
+
   function toggleSort(key: SortKey) {
     if (key === sortKey) {
       setSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -125,7 +138,7 @@ export function RegionStatsPanel() {
             setSido(event.target.value);
             setRegionCode("");
           }}
-          className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+          className="input-field w-auto pr-8 text-sm"
         >
           <option value="">전체 시도</option>
           {regionsQuery.data?.map((group) => (
@@ -139,7 +152,7 @@ export function RegionStatsPanel() {
           value={regionCode}
           onChange={(event) => setRegionCode(event.target.value)}
           disabled={!sido}
-          className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:disabled:bg-gray-800 dark:disabled:text-gray-500"
+          className="input-field w-auto pr-8 text-sm disabled:cursor-not-allowed disabled:bg-mist disabled:text-gray-400 dark:disabled:bg-gray-800 dark:disabled:text-gray-500"
         >
           <option value="">전체 시군구</option>
           {sigunguOptions.map((sigungu) => (
@@ -150,13 +163,13 @@ export function RegionStatsPanel() {
         </select>
 
         {selectedDrug ? (
-          <span className="flex items-center gap-1.5 rounded-full border border-blue-300 bg-blue-50 px-3 py-1 text-sm text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300">
+          <span className="flex items-center gap-1.5 rounded-full border border-brand/20 bg-brand-soft px-3 py-1 text-sm font-semibold text-brand dark:border-sky-400/30 dark:bg-sky-400/10 dark:text-sky-300">
             {selectedDrug.displayName}
             <button
               type="button"
               onClick={() => setSelectedDrug(null)}
               aria-label="약품 필터 해제"
-              className="text-blue-400 hover:text-blue-600 dark:text-blue-500 dark:hover:text-blue-300"
+              className="text-brand/60 hover:text-brand dark:text-sky-400/60 dark:hover:text-sky-300"
             >
               ✕
             </button>
@@ -183,16 +196,16 @@ export function RegionStatsPanel() {
       ) : sortedRows.length === 0 ? (
         <EmptyState message="조건에 맞는 통계가 없습니다." />
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="card overflow-x-auto">
           <table className="w-full min-w-[640px] text-left text-sm">
-            <thead className="bg-gray-50 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+            <thead className="border-b border-line bg-mist text-sub dark:border-gray-800 dark:bg-gray-800 dark:text-gray-400">
               <tr>
                 {COLUMNS.map((column) => (
-                  <th key={column.key} className="whitespace-nowrap px-3 py-2 font-medium">
+                  <th key={column.key} className={`whitespace-nowrap px-4 py-2.5 font-semibold ${column.numeric ? "text-right" : ""}`}>
                     <button
                       type="button"
                       onClick={() => toggleSort(column.key)}
-                      className="flex items-center gap-1 hover:text-gray-900 dark:hover:text-gray-100"
+                      className={`inline-flex items-center gap-1 hover:text-ink dark:hover:text-gray-100 ${sortKey === column.key ? "text-ink dark:text-gray-100" : ""}`}
                     >
                       {column.label}
                       {sortKey === column.key && <span>{sortDir === "asc" ? "▲" : "▼"}</span>}
@@ -201,24 +214,34 @@ export function RegionStatsPanel() {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-800 dark:bg-gray-900">
-              {sortedRows.map((row, index) => (
-                <tr key={`${row.region.code}-${row.drug.id}-${index}`} className="text-gray-700 dark:text-gray-300">
-                  <td className="whitespace-nowrap px-3 py-2">
+            <tbody className="divide-y divide-line dark:divide-gray-800 dark:bg-gray-900">
+              {pageRows.map((row, index) => (
+                <tr key={`${row.region.code}-${row.drug.id}-${index}`} className="text-ink-soft hover:bg-mist/60 dark:text-gray-300 dark:hover:bg-gray-800/60">
+                  <td className="whitespace-nowrap px-4 py-2.5">
                     {row.region.sido} {row.region.sigungu}
                   </td>
-                  <td className="whitespace-nowrap px-3 py-2">{row.drug.displayName}</td>
-                  <td className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 dark:text-gray-100">
+                  <td className="whitespace-nowrap px-4 py-2.5">{row.drug.displayName}</td>
+                  <td className="whitespace-nowrap px-4 py-2.5 text-right font-bold text-ink tabular-nums dark:text-gray-100">
                     {formatPrice(row.avgPrice)}
                   </td>
-                  <td className="whitespace-nowrap px-3 py-2">{formatPrice(row.minPrice)}</td>
-                  <td className="whitespace-nowrap px-3 py-2">{formatPrice(row.maxPrice)}</td>
-                  <td className="whitespace-nowrap px-3 py-2">{row.pharmacyCount}</td>
-                  <td className="whitespace-nowrap px-3 py-2">{row.reportCount}</td>
+                  <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">{formatPrice(row.minPrice)}</td>
+                  <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">{formatPrice(row.maxPrice)}</td>
+                  <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">{row.pharmacyCount}</td>
+                  <td className="whitespace-nowrap px-4 py-2.5 text-right tabular-nums">{row.reportCount}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {sortedRows.length > 0 && (
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
+          <p className="text-sm text-sub tabular-nums dark:text-gray-400">
+            전체 {sortedRows.length.toLocaleString("ko-KR")}행 중 {page * ROWS_PER_PAGE + 1}–
+            {Math.min((page + 1) * ROWS_PER_PAGE, sortedRows.length)}
+          </p>
+          <Pagination page={page} totalPages={totalPages} onChange={(next) => setPageState({ key: pageKey, page: next })} />
         </div>
       )}
     </div>

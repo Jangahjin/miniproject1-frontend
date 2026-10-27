@@ -3,6 +3,8 @@ export function formatPrice(price: number): string {
 }
 
 export function formatDistance(meters: number): string {
+  // 기준 좌표가 약국 위치와 거의 같으면 "0m"가 찍혀 어색하다 — 10m 미만은 문구로 대신한다.
+  if (meters < 10) return "10m 이내";
   if (meters < 1000) return `${Math.round(meters)}m`;
   return `${(meters / 1000).toFixed(1)}km`;
 }

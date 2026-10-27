@@ -1,170 +1,285 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { DrugSearch } from "@/components/search/drug-search";
 import { ScrollReveal } from "@/components/scroll-reveal";
-import { HeroSlideshow } from "@/components/hero-slideshow";
 import { SiteIntro } from "@/components/site-intro";
+import { ScrollProgress } from "@/components/home/scroll-progress";
+import { PriceCompareVisual } from "@/components/home/price-compare-visual";
+import { HeroSlideshow } from "@/components/hero-slideshow";
+import { formatPrice } from "@/lib/format";
+import { getHomeSnapshot, pickSpread, type PriceRow } from "@/lib/home-snapshot";
 
-const STEPS = [
-  { number: "01", title: "약 검색", description: "찾는 약 이름을 입력하면 근처 약국 목록이 바로 떠요." },
-  { number: "02", title: "가격 비교", description: "약국별 실제 판매가와 최저가를 큰 숫자로 한눈에 비교해요." },
-  { number: "03", title: "방문 또는 제보", description: "가까운 약국을 찾아가거나, 다녀온 뒤 가격을 제보해 정보를 더해주세요." },
+// 제목은 줄 단위로 묶고, 각 단어가 순서대로 올라오도록 전체 인덱스로 delay를 매긴다.
+const HERO_LINES = [
+  ["가장", "합리적인", "약값을"],
+  ["가장", "가까운", "곳에서"],
 ];
 
-const FEATURES = [
-  {
-    title: "내 주변에서 바로",
-    description: "GPS 또는 지역 선택으로 반경 500m~5km 내 약국을 한눈에 비교해요.",
-    icon: (
-      <svg viewBox="0 0 32 32" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M16 29c6-6.5 9-11.2 9-15.5A9 9 0 1 0 7 13.5C7 17.8 10 22.5 16 29Z" />
-        <circle cx="16" cy="13" r="3.2" />
-      </svg>
-    ),
-  },
-  {
-    title: "숫자로 보는 최저가",
-    description: "약국별 실제 판매가를 큰 숫자로 정렬해 가장 저렴한 곳이 바로 보여요.",
-    icon: (
-      <svg viewBox="0 0 32 32" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 27h24M8 27V17M15 27V9M22 27V19" />
-        <circle cx="15" cy="9" r="2.4" fill="currentColor" stroke="none" />
-      </svg>
-    ),
-  },
-  {
-    title: "다 같이 만드는 시세",
-    description: "영수증으로 가격을 제보하면 다음 사람의 검색 결과가 더 정확해져요.",
-    icon: (
-      <svg viewBox="0 0 32 32" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M5 8h22a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H14l-6 5v-5H5a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2Z" />
-        <path d="M16 13v6M13 16h6" />
-      </svg>
-    ),
-  },
+// 백엔드가 꺼져 있을 때만 쓰는 대체 그래프 — caption에 "예시"임을 분명히 밝힌다.
+const FALLBACK_ROWS: PriceRow[] = [
+  { pharmacyId: 1, name: "약국 A", price: 1700, distanceM: 300 },
+  { pharmacyId: 2, name: "약국 B", price: 1950, distanceM: 650 },
+  { pharmacyId: 3, name: "약국 C", price: 2100, distanceM: 900 },
+  { pharmacyId: 4, name: "약국 D", price: 2500, distanceM: 1300 },
+  { pharmacyId: 5, name: "약국 E", price: 4000, distanceM: 1800 },
 ];
 
-const MARQUEE_ITEMS = ["실시간 최저가 비교", "내 주변 약국 찾기", "영수증으로 가격 제보", "회원가입 없이도 검색 가능"];
-// translateX(-50%) 루프가 이음매 없이 반복되려면 두 반쪽이 완전히 같아야 한다 —
-// half를 통째로 두 번 이어 붙여 total(=full)을 만든다.
-const MARQUEE_HALF = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
-const MARQUEE_FULL = [...MARQUEE_HALF, ...MARQUEE_HALF];
+const ICONS = {
+  search: (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="m20 20-4.2-4.2" />
+    </svg>
+  ),
+  pin: (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 21c4.5-4.6 7-8.3 7-11.5a7 7 0 1 0-14 0C5 12.7 7.5 16.4 12 21Z" />
+      <circle cx="12" cy="9.5" r="2.5" />
+    </svg>
+  ),
+  receipt: (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z" />
+      <path d="M9 8h6M9 12h6" />
+    </svg>
+  ),
+};
 
-// 예전엔 이 자리에 도시 애니메이션(SVG)이 있었지만, 그래픽 없이 대형 타이포그래피와
-// 색 블록만으로 히어로를 구성하기로 했다 — 남색(navy) 배경 위에 흰 글자로 강하게
-// 대비를 준다. 라이트/다크 모드와 무관하게 히어로 자체는 항상 어두운 톤(라이트=남색,
-// 다크=검정)으로 고정해, "네이비·하늘색·검정·회색·흰색" 팔레트를 둘 다 확실히 쓴다.
-export default function Home() {
+function StepCard({ step, title, description, icon }: { step: string; title: string; description: string; icon: ReactNode }) {
+  return (
+    <article className="card flex h-full flex-col gap-4 p-6 sm:p-7">
+      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft text-brand dark:bg-sky-400/10 dark:text-sky-300">
+        {icon}
+      </span>
+      <div>
+        <p className="mb-1.5 text-xs font-extrabold tracking-[0.12em] text-sub dark:text-gray-400">{step}</p>
+        <h3 className="mb-2 text-lg font-extrabold tracking-[-0.02em] text-ink dark:text-gray-50">{title}</h3>
+        <p className="text-[15px] leading-[1.65] text-sub dark:text-gray-400">{description}</p>
+      </div>
+    </article>
+  );
+}
+
+// 시안(pharmacy-front-redesign-final.html) 구조를 따르되 디자인 리뷰에서 나온 보완을 반영했다:
+// - 히어로 배경은 실사 약국 사진 슬라이드쇼(HeroSlideshow) 위에 남색 그라디언트를 깐다.
+// - 근거 없는 수치 대신 백엔드에서 받은 실제 가격 분포를 보여주고, 출처(시드/제보)를 항상 밝힌다.
+// - 흘러가는 티커 대신 멈춰 있는 수치 3칸, 벤토는 서비스의 핵심인 "최저가"를 가장 크게.
+// - 한글 단어 단위 줄바꿈(body의 keep-all), 본문 15px 이상, 행간 1.65~1.85, 문단 폭 46ch 이하.
+export default async function Home() {
+  const snapshot = await getHomeSnapshot();
+  let wordIndex = 0;
+
+  const ratio = snapshot ? (snapshot.maxPrice / snapshot.minPrice).toFixed(1) : null;
+  const stats = snapshot
+    ? [
+        { value: `최대 ${ratio}배`, label: `${snapshot.areaLabel} 반경 ${snapshot.radiusLabel}, 같은 약의 약국별 가격 차이` },
+        { value: formatPrice(snapshot.maxSaving), label: "같은 동네 안에서 아낄 수 있는 최대 금액" },
+        snapshot.drugCount
+          ? { value: `${snapshot.drugCount}종`, label: "가격을 비교할 수 있는 일반의약품" }
+          : { value: `${snapshot.resultCount}곳`, label: `반경 ${snapshot.radiusLabel} 안에서 비교한 약국` },
+      ]
+    : [
+        { value: "최대 5km", label: "반경 안의 약국을 한 화면에서 비교" },
+        { value: "최저가순", label: "약국별 실제 판매가로 정렬" },
+        { value: "가입 없이", label: "검색 한 번으로 바로 시작" },
+      ];
+
   return (
     <>
       <SiteIntro />
-      <div className="relative mx-[calc(50%-50vw)] w-screen overflow-hidden bg-blue-950 dark:bg-black">
+      <ScrollProgress />
+
+      {/* ---------- HERO ---------- */}
+      {/* main의 pt-8을 -mt-8로 상쇄해 헤더 바로 아래부터 사진이 꽉 차게 붙인다. */}
+      <section id="hero" className="relative -mt-8 mx-[calc(50%-50vw)] w-screen overflow-hidden bg-brand-deep">
+        {/* 실사 약국 사진 3장이 5초마다 교차 페이드로 바뀐다 — 위에 남색 그라디언트를 깔아 흰 글자 가독성을 지킨다. */}
         <HeroSlideshow />
-        <div className="relative z-[2] mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 py-20 text-center sm:py-28">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-sky-400">약값 비교 서비스</p>
-          {/* 모바일(390px)은 text-3xl이어야 "약 이름으로 근처 최저가 약국을"이
-              한 줄에 들어간다 — 더 키우면 이 줄 자체가 폭을 넘겨 "약국을"이
-              "약"/"국을"로 다시 쪼개지는 회귀가 있었다. 데스크톱만 더 키운다. */}
-          <h1 className="text-3xl leading-tight font-black text-white sm:text-6xl sm:leading-tight">
-            약 이름으로 근처
-            <br />
-            최저가 약국을 찾아보세요
-          </h1>
-          <div className="w-full max-w-md pt-2">
-            <DrugSearch />
+
+        <div className="relative z-[2] mx-auto flex max-w-6xl flex-col justify-center px-6 py-20 sm:px-10 sm:py-24 lg:min-h-[min(calc(100svh-62px),720px)]">
+          <div>
+            <p className="home-fade-up mb-5 text-xs font-bold tracking-[0.18em] text-[#C9D4E6]" style={{ animationDelay: "0.1s" }}>
+              PHARMACY PRICE FINDER
+            </p>
+            <h1 className="mb-6 text-[clamp(34px,5vw,56px)] leading-[1.25] font-extrabold tracking-[-0.03em] text-white">
+              {HERO_LINES.map((line, li) => (
+                <span key={li} className="block">
+                  {line.map((word) => {
+                    const delay = 0.05 + wordIndex++ * 0.07;
+                    return (
+                      <span key={word + li} className="mr-[0.28em] inline-block overflow-hidden pb-[0.06em] align-top last:mr-0">
+                        <span className="home-word" style={{ animationDelay: `${delay}s` }}>
+                          {word}
+                        </span>
+                      </span>
+                    );
+                  })}
+                </span>
+              ))}
+            </h1>
+            <p
+              className="home-fade-up mb-10 max-w-[32rem] text-base leading-[1.75] tracking-[-0.01em] text-[#DCE1E9] sm:text-[17px]"
+              style={{ animationDelay: "0.55s" }}
+            >
+              약 이름 하나만 검색하면 내 주변 약국들의 판매가를 한눈에 비교할 수 있어요. 더 이상 발품 팔지 않아도 됩니다.
+            </p>
+            <div className="home-fade-up relative z-10 w-full max-w-[540px]" style={{ animationDelay: "0.75s" }}>
+              <DrugSearch variant="hero" />
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* 흐르는 마퀴 띠 — 밝은 하늘색 배경 대신 검정 바탕에 하늘색 글자로, 통통 튀는
-          느낌을 빼고 시크하게 눌렀다. */}
-      <div className="mx-[calc(50%-50vw)] w-screen overflow-hidden border-y-2 border-gray-950 bg-black py-2.5 dark:border-gray-50">
-        <div className="marquee-track flex w-max gap-10">
-          {MARQUEE_FULL.map((item, i) => (
-            <span key={i} className="flex items-center gap-10 text-sm font-bold whitespace-nowrap uppercase tracking-widest text-sky-400">
-              {item} <span aria-hidden="true" className="text-gray-600">/</span>
-            </span>
+      {/* ---------- 수치 띠 — 흘러가는 티커 대신 멈춰 있는 3칸 ---------- */}
+      <div className="mx-[calc(50%-50vw)] w-screen bg-brand-deep">
+        <dl className="mx-auto grid max-w-6xl grid-cols-1 divide-y divide-white/10 px-6 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:px-10">
+          {stats.map((stat) => (
+            <div key={stat.value} className="flex flex-col gap-1.5 py-6 sm:px-8 sm:py-8 sm:first:pl-0">
+              <dt className="order-2 text-[13px] leading-snug text-[#AEB9CB]">{stat.label}</dt>
+              <dd className="order-1 text-2xl font-extrabold tracking-[-0.02em] text-white tabular-nums sm:text-[28px]">{stat.value}</dd>
+            </div>
           ))}
-        </div>
+        </dl>
       </div>
 
-      <section className="flex flex-col gap-10 py-14 sm:py-20">
-        <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
-          <div className="flex flex-col gap-1">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-sky-600 dark:text-sky-400">WHY 약핏</p>
-            <h2 className="text-xl font-black text-gray-950 sm:text-2xl dark:text-gray-50">
-              약값, 왜 약국마다 다를까요?
-            </h2>
-          </div>
-          {/* 각진 인용구 카드 — 큰 따옴표 글리프 하나로 포인트를 준다. 둥근 블롭 대신
-              직선과 왼쪽 두꺼운 바로 시크하게 눌렀다. sm 이상에서는 max-w-6xl 컨테이너
-              오른쪽 여백을 뚫고 우측으로 당기되, 뷰포트 끝에 완전히 붙지 않도록 4rem
-              여백을 남긴다 — 넓은 화면에서 카드가 가운데로 쏠려 보이지 않으면서도
-              화면 끝에 딱 붙지는 않게. */}
-          <div className="relative max-w-sm border-l-4 border-gray-950 bg-gray-950 p-5 pl-6 text-sm leading-relaxed text-gray-300 sm:mr-[calc(50%-50vw+4rem)] dark:border-sky-400 dark:bg-black">
-            <span className="font-serif absolute -top-3 left-4 text-4xl text-sky-400" aria-hidden="true">
-              &ldquo;
-            </span>
-            같은 일반의약품도 약국마다 판매가가 다릅니다.
-            <br />
-            약핏이 가장 저렴한 곳을 바로 찾아드려요.
-          </div>
-        </div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 sm:gap-6">
-          {FEATURES.map((feature, i) => (
-            <ScrollReveal key={feature.title} delayMs={i * 100}>
-              <div className="flex h-full flex-col items-start gap-4 border-2 border-gray-950 bg-white p-6 dark:border-gray-50 dark:bg-gray-900">
-                <div className="flex h-12 w-12 items-center justify-center rounded-none bg-gray-950 text-sky-400 dark:bg-sky-400 dark:text-gray-950">
-                  {feature.icon}
+      {/* ---------- HOW IT WORKS — 핵심(최저가)을 가장 크게 ---------- */}
+      <section className="py-20 sm:py-28">
+        <ScrollReveal className="mb-12 max-w-[640px] sm:mb-14">
+          <p className="eyebrow mb-4">HOW IT WORKS</p>
+          <h2 className="text-[clamp(26px,3vw,36px)] leading-[1.35] font-extrabold tracking-[-0.02em] text-balance text-ink dark:text-gray-50">
+            약핏이 가격 비교를 대신해드립니다
+          </h2>
+        </ScrollReveal>
+
+        <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-[auto_auto]">
+          <ScrollReveal className="md:col-span-2 lg:row-span-2">
+            <article className="flex h-full flex-col justify-between gap-10 rounded-card border border-mint/50 bg-mint-soft p-7 sm:p-9 dark:border-mint/20 dark:bg-mint/5">
+              <div>
+                <p className="mb-2 text-xs font-extrabold tracking-[0.12em] text-mint-strong dark:text-mint">STEP 03 · 핵심</p>
+                <h3 className="mb-3 text-2xl font-extrabold tracking-[-0.02em] text-ink sm:text-[28px] dark:text-gray-50">
+                  가장 싼 약국부터 보여드려요
+                </h3>
+                <p className="max-w-[40ch] text-[15px] leading-[1.7] text-ink-soft dark:text-gray-300">
+                  거리와 정보의 신선도까지 따져 추천하고, 원하면 가격순으로 바로 바꿔 볼 수 있어요.
+                </p>
+              </div>
+              {snapshot ? (
+                <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
+                  <div>
+                    <p className="text-xs font-semibold text-sub dark:text-gray-400">최저가</p>
+                    <p className="text-[clamp(32px,4vw,44px)] leading-none font-extrabold tracking-[-0.03em] text-mint-strong tabular-nums dark:text-mint">
+                      {formatPrice(snapshot.minPrice)}
+                    </p>
+                  </div>
+                  <p className="pb-1 text-lg font-bold text-sub dark:text-gray-500">vs</p>
+                  <div>
+                    <p className="text-xs font-semibold text-sub dark:text-gray-400">최고가</p>
+                    <p className="text-[clamp(24px,3vw,32px)] leading-none font-extrabold tracking-[-0.03em] text-sub line-through decoration-2 tabular-nums dark:text-gray-500">
+                      {formatPrice(snapshot.maxPrice)}
+                    </p>
+                  </div>
+                  <p className="w-full text-xs text-sub dark:text-gray-500">
+                    {snapshot.drugName} · {snapshot.areaLabel} 반경 {snapshot.radiusLabel} · {snapshot.sourceLabel}
+                  </p>
                 </div>
-                <h3 className="text-base font-bold text-gray-950 dark:text-gray-50">{feature.title}</h3>
-                <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">{feature.description}</p>
-              </div>
-            </ScrollReveal>
-          ))}
+              ) : (
+                <p className="text-[15px] font-bold text-mint-strong dark:text-mint">최저가 약국에 민트색 표시가 붙어요.</p>
+              )}
+            </article>
+          </ScrollReveal>
+          <ScrollReveal delayMs={80}>
+            <StepCard step="STEP 01" title="약 이름 검색" description="찾는 약 이름만 입력하면 판매 중인 약국 목록이 바로 나타나요." icon={ICONS.search} />
+          </ScrollReveal>
+          <ScrollReveal delayMs={160}>
+            <StepCard step="STEP 02" title="근처 약국 비교" description="내 위치 기준 반경 500m~5km 안의 가격과 거리를 함께 비교해요." icon={ICONS.pin} />
+          </ScrollReveal>
+          <ScrollReveal delayMs={240} className="md:col-span-2">
+            <StepCard
+              step="STEP 04"
+              title="제보로 최신 유지"
+              description="다녀온 약국의 가격을 영수증과 함께 제보하면, 다음 사람의 검색 결과가 더 정확해져요."
+              icon={ICONS.receipt}
+            />
+          </ScrollReveal>
         </div>
       </section>
 
-      <section className="flex flex-col gap-8 border-t-2 border-gray-950 py-14 sm:py-20 dark:border-gray-50">
-        <div className="flex flex-col gap-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-sky-600 dark:text-sky-400">HOW IT WORKS</p>
-          <h2 className="text-xl font-black text-gray-950 sm:text-2xl dark:text-gray-50">이렇게 이용하세요</h2>
-        </div>
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-6">
-          {STEPS.map((step, i) => (
-            <ScrollReveal key={step.number} delayMs={i * 100}>
-              <div className="flex flex-col gap-2">
-                <span className="font-serif text-4xl font-semibold text-sky-500 tabular-nums dark:text-sky-400">{step.number}</span>
-                <h3 className="text-base font-bold text-gray-950 dark:text-gray-50">{step.title}</h3>
-                <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">{step.description}</p>
-              </div>
+      {/* ---------- STORY — 왼쪽 고정 그래픽 + 오른쪽 본문 ---------- */}
+      <section className="mx-[calc(50%-50vw)] w-screen bg-mist dark:bg-gray-950">
+        {/* 넓은 화면에서도 어두운 패널이 화면 왼쪽 끝까지 차도록 컨테이너로 가두지 않는다. */}
+        <div className="grid grid-cols-1 lg:grid-cols-2">
+          <div className="relative">
+            <div className="flex min-h-[480px] items-center justify-center bg-[linear-gradient(160deg,#13233F_0%,#0B1424_100%)] py-14 lg:sticky lg:top-[62px] lg:h-[calc(100vh-62px)]">
+              {snapshot ? (
+                <PriceCompareVisual
+                  title={snapshot.drugName}
+                  rows={pickSpread(snapshot.rows)}
+                  caption={`${snapshot.areaLabel} 반경 ${snapshot.radiusLabel} 약국 ${snapshot.resultCount}곳 중 가격대별로 고른 5곳 · 출처: ${snapshot.sourceLabel}`}
+                />
+              ) : (
+                <PriceCompareVisual title="타이레놀 500mg 8정" rows={FALLBACK_ROWS} caption="위 수치는 이해를 돕기 위한 예시입니다." />
+              )}
+            </div>
+          </div>
+          <div className="flex max-w-[640px] flex-col justify-center gap-12 px-6 py-16 sm:px-10 lg:py-[12vh] lg:pr-14 lg:pl-16">
+            <ScrollReveal>
+              <p className="eyebrow mb-4">WHY WE BUILT THIS</p>
+              <h2 className="mb-6 text-[clamp(24px,2.6vw,32px)] leading-[1.4] font-extrabold tracking-[-0.02em] text-ink dark:text-gray-50">
+                약국마다 다른 가격,
+                <br />
+                소비자는 알기 어렵습니다
+              </h2>
+              <p className="max-w-[46ch] text-base leading-[1.85] text-ink-soft dark:text-gray-300">
+                같은 일반의약품도 약국에 따라 판매가가 꽤 차이 나지만, 정작 그 정보를 미리 확인할 방법은 거의 없었습니다.
+              </p>
+              <p className="mt-4 max-w-[46ch] text-base leading-[1.85] text-ink-soft dark:text-gray-300">
+                약핏은 무작정 가까운 약국이 아니라, 가까우면서도 가장 합리적인 약국을 먼저 알려드립니다.
+              </p>
             </ScrollReveal>
-          ))}
+            <ScrollReveal>
+              <dl className="grid grid-cols-1 gap-8 border-t border-line pt-8 sm:grid-cols-2 sm:gap-6 dark:border-gray-800">
+                <div>
+                  <dt className="mb-2 text-xl font-extrabold tracking-[-0.02em] text-brand dark:text-sky-400">데이터 기반</dt>
+                  <dd className="text-[15px] leading-[1.7] text-sub dark:text-gray-400">
+                    판매가와 이용자 제보를 모아, 튀는 값은 걸러내고 대표 가격을 계산합니다.
+                  </dd>
+                </div>
+                <div>
+                  <dt className="mb-2 text-xl font-extrabold tracking-[-0.02em] text-brand dark:text-sky-400">위치 기반</dt>
+                  <dd className="text-[15px] leading-[1.7] text-sub dark:text-gray-400">내 위치에서 가까운 약국부터 거리와 함께 보여드립니다.</dd>
+                </div>
+              </dl>
+            </ScrollReveal>
+          </div>
         </div>
       </section>
 
-      {/* 히어로와 같은 남색/검정 블록으로 페이지를 마무리하며, 제보 참여(회원가입)로 이어준다. */}
-      <div className="mx-[calc(50%-50vw)] w-screen bg-blue-950 dark:bg-black">
-        <div className="relative z-[2] mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 py-16 text-center sm:py-20">
-          <h2 className="text-2xl font-black text-white sm:text-3xl">가격 제보로 함께 만들어가요</h2>
-          <p className="max-w-md text-sm leading-relaxed text-sky-100/80">
-            회원가입하고 다녀온 약국의 가격을 제보하면, 다음 사람의 검색 결과가 더 정확해져요.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+      {/* ---------- CTA ---------- */}
+      <section className="relative mx-[calc(50%-50vw)] w-screen overflow-hidden bg-ink px-6 py-24 text-center text-white sm:py-28">
+        <div
+          aria-hidden="true"
+          className="home-drift absolute -inset-x-[10%] -inset-y-[40%] bg-[radial-gradient(circle_at_30%_30%,rgba(31,60,102,0.55),transparent_60%)]"
+        />
+        <ScrollReveal className="relative z-[1] mx-auto flex max-w-xl flex-col items-center">
+          <h2 className="mb-4 text-[clamp(26px,3.2vw,40px)] leading-[1.3] font-extrabold tracking-[-0.025em] text-balance">
+            지금 바로 약값을 비교해보세요
+          </h2>
+          <p className="mb-10 text-base leading-[1.7] text-[#B7BAC0]">가입 없이, 검색 한 번으로 시작할 수 있습니다.</p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="#hero"
+              className="inline-flex items-center gap-2 rounded-control bg-white px-8 py-4 text-[15px] font-extrabold text-ink transition hover:-translate-y-[3px] hover:shadow-[0_14px_30px_rgba(0,0,0,0.3)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+            >
+              약핏 시작하기 →
+            </a>
             <Link
               href="/signup"
-              className="rounded-none border-2 border-white bg-white px-5 py-2.5 text-sm font-semibold uppercase tracking-wide text-blue-950 hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+              className="inline-flex items-center rounded-control border border-white/30 px-6 py-4 text-[15px] font-bold text-white transition hover:border-white hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
             >
-              회원가입
-            </Link>
-            <Link
-              href="/login"
-              className="rounded-none border-2 border-white px-5 py-2.5 text-sm font-semibold uppercase tracking-wide text-white hover:bg-white hover:text-blue-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
-            >
-              로그인
+              회원가입하고 가격 제보하기
             </Link>
           </div>
-        </div>
-      </div>
+        </ScrollReveal>
+      </section>
     </>
   );
 }

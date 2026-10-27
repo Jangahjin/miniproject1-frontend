@@ -12,9 +12,33 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  /* 한글엔 글리프가 없어 숫자(가격 등) 전용으로만 쓴다 — PriceTag 참고. */
-  --font-serif: var(--font-fraunces);
+  /* Pretendard는 layout.tsx에서 CDN(동적 서브셋)으로 불러온다 — 한글·영문·숫자를 한 폰트로
+     통일해 OS마다 맑은 고딕/애플 고딕으로 갈리던 인상을 없앤다. */
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", var(--font-geist-sans), sans-serif;
+}
+
+/* ---------- 디자인 토큰 ----------
+   홈 리디자인에서 정한 팔레트를 사이트 전체의 단일 기준으로 삼는다. 페이지마다
+   #1F3C66 같은 hex나 blue-950/sky-400을 따로 쓰지 말고 아래 토큰 클래스를 쓴다.
+   - brand: 남색 — 주요 버튼·링크·강조 텍스트
+   - mint: "최저가"의 의미 색 — 가격 이득을 나타낼 때만 쓴다 (장식용 금지)
+   - ink/sub/line/mist: 본문 글자·보조 글자·테두리·옅은 면 */
+@theme {
+  --color-brand: #1f3c66;
+  --color-brand-deep: #13233f;
+  --color-brand-soft: #e9eef6;
+  --color-brand-light: #8fa2c2;
+  --color-ink: #14161a;
+  --color-ink-soft: #3a3d44;
+  --color-sub: #5c626b;
+  --color-line: #e4e6ea;
+  --color-mist: #f5f6f8;
+  --color-mint: #6fd3a4;
+  /* 흰 배경 위 작은 글자용 — #6fd3a4는 대비가 낮아(약 1.8:1) 글자로는 이 진한 톤을 쓴다. */
+  --color-mint-strong: #13805a;
+  --color-mint-soft: #e7f7ef;
+  --radius-card: 1rem;
+  --radius-control: 0.625rem;
 }
 
 .dark {
@@ -25,7 +49,30 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  /* 한글이 단어 중간에서 줄바꿈되지 않게 사이트 전체 기본값으로 둔다. */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ---------- 공용 컴포넌트 클래스 ----------
+   예전의 각진 검정 테두리 + 하드 섀도우 스타일을 걷어내고, 홈과 같은
+   둥근 모서리 + 얇은 테두리 + 부드러운 그림자로 통일한다. */
+@utility btn-primary {
+  @apply inline-flex items-center justify-center gap-1.5 rounded-control bg-brand px-5 py-2.5 text-sm font-bold text-white transition hover:-translate-y-px hover:bg-brand-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:pointer-events-none disabled:opacity-50 dark:bg-sky-400 dark:text-brand-deep dark:hover:bg-sky-300 dark:focus-visible:outline-sky-400;
+}
+@utility btn-secondary {
+  @apply inline-flex items-center justify-center gap-1.5 rounded-control border border-line bg-white px-5 py-2.5 text-sm font-bold text-ink transition hover:border-brand hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:pointer-events-none disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-sky-400 dark:hover:text-sky-300;
+}
+@utility card {
+  @apply rounded-card border border-line bg-white dark:border-gray-800 dark:bg-gray-900;
+}
+@utility input-field {
+  @apply w-full rounded-control border border-line bg-white px-3.5 py-2.5 text-[15px] text-ink transition outline-none placeholder:text-gray-400 focus:border-brand focus:ring-3 focus:ring-brand/15 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-sky-400 dark:focus:ring-sky-400/20;
+}
+/* 섹션 머리의 영문 소제목(HOW IT WORKS 등) */
+@utility eyebrow {
+  @apply text-xs font-bold tracking-[0.16em] text-brand dark:text-sky-400;
 }
 
 /* 브라우저가 자동완성한 입력창은 크롬이 -webkit-box-shadow로 배경을 강제로 덮어써서
@@ -45,14 +92,14 @@ input:-webkit-autofill:focus {
 }
 
 /* 지도에서 클릭한 약국 마커를 "내가 이걸 눌렀다"고 바로 알아보게 펄스로 강조한다.
-   하늘색(sky-500)을 골라, 1위 약국에 쓰는 남색(navy)과 뚜렷하게 구분되게 했다. */
+   흰 링 + 브랜드 남색 테두리 — 1위 약국 마커의 민트 배경과 뚜렷하게 구분된다. */
 @keyframes pharmacy-marker-selected-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 2px #0ea5e9, 0 0 0 2px #0ea5e9;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1f3c66;
   }
   50% {
-    box-shadow: 0 0 0 2px #0ea5e9, 0 0 5px 2px rgba(14, 165, 233, 0.6);
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1f3c66, 0 0 10px 4px rgba(31, 60, 102, 0.45);
   }
 }
 
@@ -76,26 +123,75 @@ input:-webkit-autofill:focus {
   }
 }
 
-/* 인트로 화면의 알약 아이콘이 한 번 통통 튀며 나타나는 연출 — 루프 없이 한 번만. */
-@keyframes intro-pill-pop {
-  0% {
-    opacity: 0;
-    transform: scale(0.6) rotate(-20deg);
-  }
-  70% {
+/* ---------- 홈 리디자인 ---------- */
+/* 히어로 제목이 단어 단위로 아래에서 밀려 올라오며 나타난다 — 각 단어에 delay를 달리 준다. */
+@keyframes home-word-up {
+  to {
+    transform: translateY(0);
     opacity: 1;
-    transform: scale(1.08) rotate(4deg);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
   }
 }
-.intro-pill {
-  animation: intro-pill-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+.home-word {
+  display: inline-block;
+  transform: translateY(110%);
+  opacity: 0;
+  animation: home-word-up 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes home-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.home-fade-up {
+  opacity: 0;
+  animation: home-fade-up 0.7s ease forwards;
+}
+/* 히어로 하단 "SCROLL" 표시의 세로선 안에서 흰 줄이 계속 흘러내린다. */
+@keyframes home-scroll-cue {
+  0% {
+    top: -100%;
+  }
+  60%,
+  100% {
+    top: 100%;
+  }
+}
+.home-scroll-cue::after {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  animation: home-scroll-cue 1.8s ease-in-out infinite;
+}
+/* 마지막 CTA 블록 배경의 남색 빛 번짐이 천천히 떠다닌다. */
+@keyframes home-drift {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(5%, 4%);
+  }
+}
+.home-drift {
+  animation: home-drift 14s ease-in-out infinite alternate;
 }
 @media (prefers-reduced-motion: reduce) {
-  .intro-pill {
+  .home-word,
+  .home-fade-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .home-scroll-cue::after,
+  .home-drift {
     animation: none;
   }
 }

@@ -241,7 +241,7 @@ function ReportForm() {
             <button
               type="button"
               onClick={() => updateDraft({ pharmacyId: null, pharmacyName: "" })}
-              className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+              className="text-sm font-medium text-brand hover:underline dark:text-sky-400"
             >
               변경
             </button>
@@ -265,7 +265,7 @@ function ReportForm() {
             <button
               type="button"
               onClick={() => updateDraft({ drugId: null, drugName: "", packageUnit: "" })}
-              className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+              className="text-sm font-medium text-brand hover:underline dark:text-sky-400"
             >
               변경
             </button>
@@ -299,7 +299,7 @@ function ReportForm() {
             onChange={(event) => handlePriceChange(event.target.value)}
             aria-invalid={!!priceError}
             aria-describedby={priceError ? "price-error" : undefined}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            className="input-field"
           />
           {priceError && (
             <p id="price-error" role="alert" className="text-xs text-red-600">
@@ -325,7 +325,7 @@ function ReportForm() {
               max={todayISODate()}
               value={draft.purchasedAt}
               onChange={(event) => updateDraft({ purchasedAt: event.target.value })}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="input-field"
             />
           </div>
 
@@ -347,7 +347,7 @@ function ReportForm() {
                   <span className="text-gray-900">{receiptFileName}</span>
                   {isUploadingReceipt && <span className="text-xs text-gray-500">업로드 중...</span>}
                   {draft.receiptFileId && !isUploadingReceipt && (
-                    <span className="text-xs text-blue-600">업로드 완료</span>
+                    <span className="text-xs text-brand">업로드 완료</span>
                   )}
                 </div>
                 <button
@@ -368,7 +368,7 @@ function ReportForm() {
                 disabled={isUploadingReceipt}
                 aria-invalid={!!receiptError}
                 aria-describedby={receiptError ? "receipt-error" : undefined}
-                className="text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-blue-600 hover:file:bg-blue-100"
+                className="text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-soft file:px-3 file:py-2 file:text-sm file:font-medium file:text-brand hover:file:bg-brand-soft"
               />
             )}
             {receiptError && (
@@ -388,7 +388,7 @@ function ReportForm() {
               rows={3}
               value={draft.memo}
               onChange={(event) => updateDraft({ memo: event.target.value })}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="input-field"
             />
           </div>
         </div>
@@ -409,7 +409,7 @@ function ReportForm() {
       <button
         type="submit"
         disabled={isSubmitting || isUploadingReceipt}
-        className="rounded-none border-2 border-gray-950 bg-gray-950 px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white shadow-[3px_3px_0_0_#2563eb] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_#2563eb] active:translate-x-0 active:translate-y-0 active:shadow-[1px_1px_0_0_#2563eb] disabled:pointer-events-none disabled:opacity-50"
+        className="btn-primary"
       >
         {isSubmitting ? "제보 중..." : "제보하기"}
       </button>

@@ -81,7 +81,7 @@ export function PharmacyDrugPrices({
           onClick={() => setActiveTab("전체")}
           className={`shrink-0 whitespace-nowrap pb-2 ${
             activeTab === "전체"
-              ? "border-b-2 border-blue-600 font-semibold text-blue-600 dark:border-blue-400 dark:text-blue-400"
+              ? "border-b-2 border-brand font-semibold text-brand dark:border-sky-400 dark:text-sky-400"
               : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           }`}
         >
@@ -94,7 +94,7 @@ export function PharmacyDrugPrices({
             onClick={() => setActiveTab(category)}
             className={`shrink-0 whitespace-nowrap pb-2 ${
               activeTab === category
-                ? "border-b-2 border-blue-600 font-semibold text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                ? "border-b-2 border-brand font-semibold text-brand dark:border-sky-400 dark:text-sky-400"
                 : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             }`}
           >

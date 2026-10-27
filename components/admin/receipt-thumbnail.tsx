@@ -47,5 +47,5 @@ export function ReceiptThumbnail({ fileId }: { fileId: number }) {
     return <div className="h-12 w-12 shrink-0 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700" aria-hidden="true" />;
   }
   // eslint-disable-next-line @next/next/no-img-element -- blob: object URL이라 next/image 최적화 대상이 아니다
-  return <img src={url} alt="영수증" className="h-12 w-12 shrink-0 rounded-lg border border-gray-200 object-cover dark:border-gray-700" />;
+  return <img src={url} alt="영수증" className="h-12 w-12 shrink-0 rounded-lg border border-line object-cover dark:border-gray-700" />;
 }

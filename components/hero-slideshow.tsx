@@ -36,8 +36,9 @@ export function HeroSlideshow() {
           }`}
         />
       ))}
-      {/* 사진 위에 남색 톤을 짙게 깔아서 흰 글자 가독성과 사이트의 네이비 정체성을 유지한다. */}
-      <div className="absolute inset-0 bg-blue-950/80 dark:bg-black/85" />
+      {/* 왼쪽(글자 쪽)은 짙게, 오른쪽은 옅게 깔아 흰 글자 가독성을 지키면서도 사진이 실제로 보이게 한다. */}
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(19,35,63,0.92)_0%,rgba(19,35,63,0.75)_45%,rgba(19,35,63,0.35)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,20,36,0)_60%,rgba(11,20,36,0.6)_100%)]" />
     </div>
   );
 }

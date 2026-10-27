@@ -11,6 +11,8 @@ import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { PriceTag } from "@/components/ui/PriceTag";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ReceiptThumbnail } from "@/components/admin/receipt-thumbnail";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { Pagination } from "@/components/ui/Pagination";
 
 // docs/API.md §8 GET /admin/price-reports 목록 항목 형태.
 interface AdminReportItem {
@@ -20,12 +22,28 @@ interface AdminReportItem {
   price: number;
   purchasedAt: string;
   reporter: { id: number; nickname: string; email: string } | null;
+  source: "SEED" | "USER";
   flagReason: string | null;
   receiptFileId: number | null;
 }
 
 interface AdminReportListResponse {
   content: AdminReportItem[];
+  totalElements: number;
+  totalPages: number;
+}
+
+// 예전엔 size=50 한 번만 불러와 347건 중 앞 50건만 보였다 — 서버 페이지네이션으로 전체를 넘겨 본다.
+const PAGE_SIZE = 20;
+
+// 시드 제보는 제보자·사유가 원래 비어 있다(null) — "알 수 없음 (-) · 사유 -"처럼 빈 값을 대시로
+// 늘어놓는 대신, 출처를 밝히고 값이 있는 항목만 보여준다.
+function describeReport(report: AdminReportItem): string {
+  const parts: string[] = [];
+  if (report.reporter) parts.push(`제보자 ${report.reporter.nickname} (${report.reporter.email})`);
+  else parts.push(report.source === "SEED" ? "시드 데이터" : "제보자 정보 없음");
+  if (report.flagReason) parts.push(`사유 ${report.flagReason}`);
+  return parts.join(" · ");
 }
 
 export default function AdminReportsPage() {
@@ -33,16 +51,19 @@ export default function AdminReportsPage() {
   const queryClient = useQueryClient();
   const [confirmTarget, setConfirmTarget] = useState<AdminReportItem | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
 
   // status=ACTIVE로 좁혀서 이미 숨김 처리된 건은 다시 보이지 않게 한다.
   const reportsQuery = useQuery({
-    queryKey: ["admin", "price-reports", "flagged"],
+    queryKey: ["admin", "price-reports", "flagged", page],
     queryFn: () =>
       apiFetch<AdminReportListResponse>(
-        "/api/v1/admin/price-reports?flagged=true&status=ACTIVE&size=50",
+        `/api/v1/admin/price-reports?flagged=true&status=ACTIVE&page=${page}&size=${PAGE_SIZE}`,
         { auth: true }
       ),
     retry: false,
+    // 페이지를 넘길 때 목록이 로딩 스켈레톤으로 깜빡이지 않게 이전 페이지를 잠시 유지한다.
+    placeholderData: (previous) => previous,
   });
 
   useEffect(() => {
@@ -52,6 +73,8 @@ export default function AdminReportsPage() {
   }, [reportsQuery.error, router]);
 
   async function refreshAfterAction() {
+    // 마지막 페이지의 마지막 한 건을 처리하면 그 페이지가 비므로 한 칸 앞으로 옮긴다.
+    if (page > 0 && (reportsQuery.data?.content.length ?? 0) <= 1) setPage(page - 1);
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ["admin", "price-reports"] }),
       queryClient.invalidateQueries({ queryKey: ["admin", "overview"] }),
@@ -97,10 +120,24 @@ export default function AdminReportsPage() {
   }
 
   const reports = reportsQuery.data?.content ?? [];
+  const total = reportsQuery.data?.totalElements ?? reports.length;
+  const totalPages = reportsQuery.data?.totalPages ?? 1;
+  const from = page * PAGE_SIZE + 1;
+  const to = page * PAGE_SIZE + reports.length;
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">이상치 제보 관리</h1>
+    <div className="flex flex-col gap-5">
+      <AdminPageHeader title="이상치 제보" description="가격대에서 크게 벗어난 제보입니다. 정상이면 복구, 잘못된 값이면 숨김 처리하세요.">
+        {reports.length > 0 && (
+          <p className="text-sm text-sub dark:text-gray-400">
+            검토 대기 <b className="font-bold text-ink tabular-nums dark:text-gray-100">{total.toLocaleString("ko-KR")}</b>건 ·{" "}
+            <span className="tabular-nums">
+              {from}–{to}
+            </span>
+            번째 표시
+          </p>
+        )}
+      </AdminPageHeader>
       {actionError && (
         <p role="alert" className="text-sm text-red-600 dark:text-red-400">
           {actionError}
@@ -110,7 +147,7 @@ export default function AdminReportsPage() {
       {reports.length === 0 ? (
         <EmptyState message="검토가 필요한 이상치 제보가 없습니다." />
       ) : (
-        <ul className="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white dark:divide-gray-800 dark:border-gray-700 dark:bg-gray-900">
+        <ul className="card divide-y divide-line overflow-hidden dark:divide-gray-800">
           {reports.map((report) => (
             <li
               key={report.id}
@@ -119,30 +156,28 @@ export default function AdminReportsPage() {
               <div className="flex items-center gap-3">
                 {report.receiptFileId != null && <ReceiptThumbnail fileId={report.receiptFileId} />}
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-gray-100">
+                  <p className="font-bold text-ink dark:text-gray-100">
                     {report.pharmacy.name} · {report.drug.displayName} ({report.drug.packageUnit})
                   </p>
                   <p className="text-sm">
-                    <PriceTag price={report.price} /> <span className="text-gray-400 dark:text-gray-500">· {report.purchasedAt} 구매</span>
+                    <PriceTag price={report.price} /> <span className="text-sub dark:text-gray-400">· {report.purchasedAt} 구매</span>
                   </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">
-                    제보자 {report.reporter?.nickname ?? "알 수 없음"} ({report.reporter?.email ?? "-"}) · 사유{" "}
-                    {report.flagReason ?? "-"}
-                  </p>
+                  <p className="mt-0.5 text-xs text-sub dark:text-gray-500">{describeReport(report)}</p>
                 </div>
               </div>
               <div className="flex shrink-0 gap-2">
                 <button
                   type="button"
                   onClick={() => handleRestore(report)}
-                  className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                  className="btn-secondary px-4 py-2"
                 >
                   복구
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmTarget(report)}
-                  className="rounded-lg border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
+                  // 복구 버튼과 같은 크기(btn-secondary)에 위험 동작임을 빨간 톤으로만 구분한다.
+                  className="btn-secondary border-red-200 px-4 py-2 text-red-600 hover:border-red-400 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:text-red-400 dark:hover:border-red-700 dark:hover:bg-red-950 dark:hover:text-red-300"
                 >
                   숨김
                 </button>
@@ -151,6 +186,15 @@ export default function AdminReportsPage() {
           ))}
         </ul>
       )}
+
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        onChange={(next) => {
+          setPage(next);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
 
       <ConfirmDialog
         open={confirmTarget !== null}
