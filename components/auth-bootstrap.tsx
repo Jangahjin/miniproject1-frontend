@@ -1,29 +1,21 @@
 "use client";
 
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "@/store";
-import { setSession } from "@/store/slices/auth-slice";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
+import { refreshSession } from "@/lib/api";
 
 // 새로고침하면 accessToken(메모리)이 사라지므로, httpOnly refreshToken 쿠키가
 // 남아있다면 조용히 세션을 복원한다. 실패해도 그냥 로그아웃 상태로 둔다.
+// 직접 fetch하지 않고 refreshSession()을 쓰는 이유: 같은 시점에 페이지의 API 호출도
+// 401 재시도로 갱신을 시도할 수 있어, 갱신 요청을 하나로 합쳐야 토큰 회전 충돌이 안 난다.
 export function AuthBootstrap() {
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
-  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     if (accessToken) return;
-
-    fetch("/api/auth/refresh", { method: "POST" })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        // 세션이 없는 익명 방문자에게도 이제 200과 accessToken: null이 내려오므로
-        // (app/api/auth/refresh/route.ts), 값이 실제로 있을 때만 세션을 채운다.
-        if (data?.accessToken) dispatch(setSession({ accessToken: data.accessToken, user: data.user }));
-      })
-      .catch(() => {
-        // 세션 복원 실패는 조용히 무시한다.
-      });
+    // 세션이 없는 익명 방문자에게도 200 + accessToken: null이 내려오고, 그땐 false로 끝난다.
+    void refreshSession();
     // 마운트 시 1회만 시도한다.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

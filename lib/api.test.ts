@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { apiFetch } from "./api";
+import { apiFetch, refreshSession } from "./api";
 
 describe("apiFetch", () => {
   beforeEach(() => {
@@ -63,5 +63,35 @@ describe("apiFetch", () => {
     const result = await apiFetch("/api/v1/test");
 
     expect(result).toBeUndefined();
+  });
+});
+
+describe("refreshSession", () => {
+  beforeEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("동시에 여러 번 호출해도 갱신 요청은 한 번만 보낸다 (토큰 회전 충돌 방지)", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ accessToken: null, user: null }), { status: 200 })
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const results = await Promise.all([refreshSession(), refreshSession(), refreshSession()]);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(results).toEqual([false, false, false]);
+  });
+
+  it("앞선 갱신이 끝난 뒤의 호출은 새 요청을 보낸다", async () => {
+    const fetchMock = vi.fn().mockImplementation(
+      async () => new Response(JSON.stringify({ accessToken: null, user: null }), { status: 200 })
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await refreshSession();
+    await refreshSession();
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });
