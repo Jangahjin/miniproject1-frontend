@@ -10,6 +10,7 @@ import { useAdminGuard } from "@/hooks/use-admin-guard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import { Pagination } from "@/components/ui/Pagination";
 
 // docs/API.md §7 GET /regions 응답 형태 (region-picker.tsx와 동일 엔드포인트).
 interface Sigungu {
@@ -37,6 +38,9 @@ interface RegionStatsRow {
 interface RegionStatsResponse {
   rows: RegionStatsRow[];
 }
+
+// 전체 시도 기준이면 수백 행이 한 번에 깔려 스크롤이 끝없이 길어진다 — 20행씩 끊어 보여준다.
+const ROWS_PER_PAGE = 20;
 
 type SortKey = "region" | "drug" | "avgPrice" | "minPrice" | "maxPrice" | "pharmacyCount" | "reportCount";
 
@@ -105,6 +109,14 @@ export function RegionStatsPanel() {
     if (sortDir === "desc") sorted.reverse();
     return sorted;
   }, [statsQuery.data, sortKey, sortDir]);
+
+  // 필터·정렬이 바뀌면 1페이지로 돌아가야 한다. effect로 setState하는 대신 "어떤 조건에서의
+  // 페이지 번호인지"를 함께 저장해 두고, 조건(pageKey)이 달라졌으면 0페이지로 본다.
+  const pageKey = `${sido}|${regionCode}|${selectedDrug?.id ?? ""}|${sortKey}|${sortDir}`;
+  const [pageState, setPageState] = useState({ key: pageKey, page: 0 });
+  const page = pageState.key === pageKey ? pageState.page : 0;
+  const totalPages = Math.ceil(sortedRows.length / ROWS_PER_PAGE);
+  const pageRows = sortedRows.slice(page * ROWS_PER_PAGE, (page + 1) * ROWS_PER_PAGE);
 
   function toggleSort(key: SortKey) {
     if (key === sortKey) {
@@ -203,7 +215,7 @@ export function RegionStatsPanel() {
               </tr>
             </thead>
             <tbody className="divide-y divide-line dark:divide-gray-800 dark:bg-gray-900">
-              {sortedRows.map((row, index) => (
+              {pageRows.map((row, index) => (
                 <tr key={`${row.region.code}-${row.drug.id}-${index}`} className="text-ink-soft hover:bg-mist/60 dark:text-gray-300 dark:hover:bg-gray-800/60">
                   <td className="whitespace-nowrap px-4 py-2.5">
                     {row.region.sido} {row.region.sigungu}
@@ -220,6 +232,16 @@ export function RegionStatsPanel() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {sortedRows.length > 0 && (
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
+          <p className="text-sm text-sub tabular-nums dark:text-gray-400">
+            전체 {sortedRows.length.toLocaleString("ko-KR")}행 중 {page * ROWS_PER_PAGE + 1}–
+            {Math.min((page + 1) * ROWS_PER_PAGE, sortedRows.length)}
+          </p>
+          <Pagination page={page} totalPages={totalPages} onChange={(next) => setPageState({ key: pageKey, page: next })} />
         </div>
       )}
     </div>

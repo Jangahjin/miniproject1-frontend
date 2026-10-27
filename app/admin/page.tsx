@@ -16,6 +16,7 @@ import {
 import { apiFetch, ApiError } from "@/lib/api";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
 
 // docs/API.md §8 GET /admin/stats/overview 응답 형태.
 interface AdminOverviewResponse {
@@ -82,20 +83,11 @@ export default function AdminDashboardPage() {
   if (!data) return null;
 
   return (
-    <div className="flex flex-col gap-6 pb-16">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-extrabold tracking-[-0.02em] text-ink dark:text-gray-50">관리자 대시보드</h1>
-        <div className="flex gap-4">
-          <Link href="/admin/stats" className="text-sm font-medium text-brand hover:underline dark:text-sky-400">
-            통계 상세 →
-          </Link>
-          <Link href="/admin/reports" className="text-sm font-medium text-brand hover:underline dark:text-sky-400">
-            이상치 제보 관리 →
-          </Link>
-        </div>
-      </div>
+    <>
+      {/* 다른 화면으로 가는 링크는 왼쪽 관리자 메뉴(AdminNav)가 맡는다. */}
+      <AdminPageHeader title="대시보드" description="서비스 전체 현황을 한눈에 봅니다. 처리할 일이 있으면 빨간 카드로 표시됩니다." />
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
         <KpiCard label="약국 수" value={data.totals.pharmacyCount.toLocaleString("ko-KR")} />
         <KpiCard label="약품 수" value={data.totals.drugCount.toLocaleString("ko-KR")} />
         <KpiCard label="제보 수" value={data.totals.reportCount.toLocaleString("ko-KR")} />
@@ -129,6 +121,6 @@ export default function AdminDashboardPage() {
           </LineChart>
         </ResponsiveContainer>
       </section>
-    </div>
+    </>
   );
 }

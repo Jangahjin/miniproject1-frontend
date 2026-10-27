@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -12,6 +11,8 @@ import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { PriceTag } from "@/components/ui/PriceTag";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ReceiptThumbnail } from "@/components/admin/receipt-thumbnail";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { Pagination } from "@/components/ui/Pagination";
 
 // docs/API.md §8 GET /admin/price-reports 목록 항목 형태.
 interface AdminReportItem {
@@ -29,7 +30,11 @@ interface AdminReportItem {
 interface AdminReportListResponse {
   content: AdminReportItem[];
   totalElements: number;
+  totalPages: number;
 }
+
+// 예전엔 size=50 한 번만 불러와 347건 중 앞 50건만 보였다 — 서버 페이지네이션으로 전체를 넘겨 본다.
+const PAGE_SIZE = 20;
 
 // 시드 제보는 제보자·사유가 원래 비어 있다(null) — "알 수 없음 (-) · 사유 -"처럼 빈 값을 대시로
 // 늘어놓는 대신, 출처를 밝히고 값이 있는 항목만 보여준다.
@@ -46,16 +51,19 @@ export default function AdminReportsPage() {
   const queryClient = useQueryClient();
   const [confirmTarget, setConfirmTarget] = useState<AdminReportItem | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
 
   // status=ACTIVE로 좁혀서 이미 숨김 처리된 건은 다시 보이지 않게 한다.
   const reportsQuery = useQuery({
-    queryKey: ["admin", "price-reports", "flagged"],
+    queryKey: ["admin", "price-reports", "flagged", page],
     queryFn: () =>
       apiFetch<AdminReportListResponse>(
-        "/api/v1/admin/price-reports?flagged=true&status=ACTIVE&size=50",
+        `/api/v1/admin/price-reports?flagged=true&status=ACTIVE&page=${page}&size=${PAGE_SIZE}`,
         { auth: true }
       ),
     retry: false,
+    // 페이지를 넘길 때 목록이 로딩 스켈레톤으로 깜빡이지 않게 이전 페이지를 잠시 유지한다.
+    placeholderData: (previous) => previous,
   });
 
   useEffect(() => {
@@ -65,6 +73,8 @@ export default function AdminReportsPage() {
   }, [reportsQuery.error, router]);
 
   async function refreshAfterAction() {
+    // 마지막 페이지의 마지막 한 건을 처리하면 그 페이지가 비므로 한 칸 앞으로 옮긴다.
+    if (page > 0 && (reportsQuery.data?.content.length ?? 0) <= 1) setPage(page - 1);
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ["admin", "price-reports"] }),
       queryClient.invalidateQueries({ queryKey: ["admin", "overview"] }),
@@ -111,21 +121,23 @@ export default function AdminReportsPage() {
 
   const reports = reportsQuery.data?.content ?? [];
   const total = reportsQuery.data?.totalElements ?? reports.length;
+  const totalPages = reportsQuery.data?.totalPages ?? 1;
+  const from = page * PAGE_SIZE + 1;
+  const to = page * PAGE_SIZE + reports.length;
 
   return (
-    <div className="flex flex-col gap-5 pb-16">
-      <div className="flex flex-col gap-1">
-        <Link href="/admin" className="w-fit text-sm text-sub hover:text-brand dark:text-gray-400 dark:hover:text-sky-300">
-          ← 관리자 대시보드
-        </Link>
-        <h1 className="text-2xl font-extrabold tracking-[-0.02em] text-ink dark:text-gray-50">이상치 제보 관리</h1>
+    <div className="flex flex-col gap-5">
+      <AdminPageHeader title="이상치 제보" description="가격대에서 크게 벗어난 제보입니다. 정상이면 복구, 잘못된 값이면 숨김 처리하세요.">
         {reports.length > 0 && (
           <p className="text-sm text-sub dark:text-gray-400">
-            검토 대기 <b className="font-bold text-ink tabular-nums dark:text-gray-100">{total.toLocaleString("ko-KR")}</b>건
-            {total > reports.length && ` 중 ${reports.length}건 표시`}
+            검토 대기 <b className="font-bold text-ink tabular-nums dark:text-gray-100">{total.toLocaleString("ko-KR")}</b>건 ·{" "}
+            <span className="tabular-nums">
+              {from}–{to}
+            </span>
+            번째 표시
           </p>
         )}
-      </div>
+      </AdminPageHeader>
       {actionError && (
         <p role="alert" className="text-sm text-red-600 dark:text-red-400">
           {actionError}
@@ -174,6 +186,15 @@ export default function AdminReportsPage() {
           ))}
         </ul>
       )}
+
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        onChange={(next) => {
+          setPage(next);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
 
       <ConfirmDialog
         open={confirmTarget !== null}
