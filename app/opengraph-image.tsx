@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { BrandMark } from "@/components/brand-mark";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -15,15 +16,15 @@ export default function OpengraphImage() {
           alignItems: "center",
           justifyContent: "center",
           gap: 24,
-          background: "#172554",
+          background: "#13233F",
           color: "#ffffff",
         }}
       >
-        <div style={{ display: "flex", alignItems: "baseline", fontSize: 96, fontWeight: 900 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 28, fontSize: 96, fontWeight: 900 }}>
+          <BrandMark size={112} />
           약핏
-          <span style={{ color: "#38bdf8", marginLeft: 4 }}>*</span>
         </div>
-        <div style={{ display: "flex", fontSize: 32, color: "#7dd3fc" }}>
+        <div style={{ display: "flex", fontSize: 32, color: "#C9D4E6" }}>
           약 이름으로 근처 최저가 약국을 찾아보세요
         </div>
       </div>

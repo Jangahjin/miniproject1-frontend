@@ -36,8 +36,13 @@ export function LocationIndicator() {
         type="button"
         onClick={() => setPanelOpen((prev) => !prev)}
         aria-expanded={panelOpen}
-        className="flex h-9 shrink-0 items-center rounded-full border border-gray-300 px-3 text-sm text-gray-600 hover:border-blue-400 hover:text-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-500 dark:hover:text-blue-400"
+        // 헤더 오른쪽 버튼들(위치·로그인)은 모두 같은 높이(h-9)와 모서리(rounded-control)로 맞춘다.
+        className="flex h-9 shrink-0 items-center gap-1.5 rounded-control border border-line bg-white px-3 text-[13px] font-semibold text-ink-soft transition hover:border-brand hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-sky-400 dark:hover:text-sky-300"
       >
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M12 21c4.5-4.6 7-8.3 7-11.5a7 7 0 1 0-14 0C5 12.7 7.5 16.4 12 21Z" />
+          <circle cx="12" cy="9.5" r="2.5" />
+        </svg>
         {label}
       </button>
       {panelOpen && <RegionPicker onSelect={handleSelectRegion} onUseGps={handleUseGps} />}

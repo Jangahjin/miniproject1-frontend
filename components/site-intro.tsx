@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { BrandMark } from "@/components/brand-mark";
 
 // 홈에 들어올 때마다 잠깐 떴다 사라지는 한 장짜리 소개 화면. 여러 장을 순서대로
 // 넘기는 슬라이드쇼가 아니라, 모바일에서는 아이콘+설명이 가로로 쌓이고 데스크톱
@@ -125,46 +126,30 @@ export function SiteIntro() {
       role="dialog"
       aria-modal="true"
       aria-label="약핏 소개"
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-10 bg-blue-950 px-6 text-center text-white sm:gap-14"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-10 bg-brand-deep px-6 text-center text-white sm:gap-14"
     >
       <button
         type="button"
         onClick={() => setVisible(false)}
-        className="absolute top-5 right-5 text-xs font-semibold tracking-widest text-sky-300 uppercase hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+        className="absolute top-5 right-5 text-xs font-semibold tracking-widest text-brand-light uppercase hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
       >
         건너뛰기
       </button>
 
       <div className="flex flex-col items-center gap-4">
-        {/* 알약(캡슐) 실루엣 — 가운데 대각선으로 반을 갈라 흰색/하늘색 두 톤을 준
-            전형적인 캡슐 아이콘이다. 추상적인 핀·차트 아이콘보다 "이건 약 사이트"라는
-            게 한눈에 들어오도록 첫 화면의 주인공으로 크게 배치했다. */}
-        <svg
-          viewBox="0 0 64 64"
-          className="intro-pill h-20 w-20 sm:h-24 sm:w-24"
-          aria-hidden="true"
-        >
-          <g transform="rotate(-45 32 32)">
-            <rect x="4" y="20" width="56" height="24" rx="12" fill="#ffffff" />
-            <rect x="4" y="20" width="28" height="24" fill="#38bdf8" clipPath="url(#intro-pill-clip)" />
-            <rect x="4" y="20" width="56" height="24" rx="12" fill="none" stroke="#e0f2fe" strokeWidth="1.5" />
-          </g>
-          <clipPath id="intro-pill-clip">
-            <rect x="4" y="20" width="28" height="24" rx="0" />
-          </clipPath>
-        </svg>
+        {/* 헤더 로고와 같은 캡슐 심볼(BrandMark)을 크게 — 첫 화면부터 같은 형태로 기억되게 한다.
+            어두운 배경 위라 남색 타일은 빼고 캡슐만 그린다. */}
+        <BrandMark tile={false} className="intro-pill h-24 w-24 sm:h-28 sm:w-28" />
         <div className="flex flex-col items-center gap-2">
-          <p className="text-3xl font-black sm:text-5xl">
-            약핏<span className="text-sky-400">*</span>
-          </p>
-          <p className="text-sm text-sky-100/80 sm:text-base">약 이름으로 근처 최저가 약국을 찾아보세요</p>
+          <p className="text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">약핏</p>
+          <p className="text-sm text-[#C9D4E6] sm:text-base">약 이름으로 근처 최저가 약국을 찾아보세요</p>
         </div>
       </div>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:gap-10">
         {POINTS.map((point) => (
           <div key={point.label} className="flex items-center gap-3 sm:flex-col sm:gap-2.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-none bg-sky-400 text-blue-950">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-mint">
               {point.icon}
             </div>
             <span className="text-sm font-medium text-white sm:text-xs sm:uppercase sm:tracking-wide">{point.label}</span>
@@ -179,7 +164,7 @@ export function SiteIntro() {
         ref={startButtonRef}
         type="button"
         onClick={() => setVisible(false)}
-        className="mt-2 rounded-none border-2 border-white bg-white px-6 py-2.5 text-sm font-semibold uppercase tracking-wide text-blue-950 hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+        className="mt-2 rounded-control bg-white px-7 py-3 text-sm font-bold text-brand-deep transition hover:-translate-y-px hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
       >
         시작하기
       </button>
