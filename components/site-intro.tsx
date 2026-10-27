@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BrandMark } from "@/components/brand-mark";
 
 // 홈에 들어올 때마다 잠깐 떴다 사라지는 한 장짜리 소개 화면. 여러 장을 순서대로
 // 넘기는 슬라이드쇼가 아니라, 모바일에서는 아이콘+설명이 가로로 쌓이고 데스크톱
@@ -137,9 +136,6 @@ export function SiteIntro() {
       </button>
 
       <div className="flex flex-col items-center gap-4">
-        {/* 헤더 로고와 같은 캡슐 심볼(BrandMark)을 크게 — 첫 화면부터 같은 형태로 기억되게 한다.
-            어두운 배경 위라 남색 타일은 빼고 캡슐만 그린다. */}
-        <BrandMark tile={false} className="intro-pill h-24 w-24 sm:h-28 sm:w-28" />
         <div className="flex flex-col items-center gap-2">
           <p className="text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">약핏</p>
           <p className="text-sm text-[#C9D4E6] sm:text-base">약 이름으로 근처 최저가 약국을 찾아보세요</p>

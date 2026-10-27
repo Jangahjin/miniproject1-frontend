@@ -1,5 +1,4 @@
 import { ImageResponse } from "next/og";
-import { BrandMark } from "@/components/brand-mark";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -20,10 +19,7 @@ export default function OpengraphImage() {
           color: "#ffffff",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 28, fontSize: 96, fontWeight: 900 }}>
-          <BrandMark size={112} />
-          약핏
-        </div>
+        <div style={{ display: "flex", fontSize: 96, fontWeight: 900 }}>약핏</div>
         <div style={{ display: "flex", fontSize: 32, color: "#C9D4E6" }}>
           약 이름으로 근처 최저가 약국을 찾아보세요
         </div>

@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Geist } from "next/font/google";
 import { LocationIndicator } from "@/components/location-indicator";
 import { AuthStatus } from "@/components/auth-status";
-import { BrandMark } from "@/components/brand-mark";
 import { Providers } from "./providers";
 import "./globals.css";
 
@@ -39,11 +38,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {/* 예전의 굵은 검정 하단선(border-b-2) 대신 홈과 같은 얇은 line 색 테두리 + 반투명 블러. */}
           <header className="sticky top-0 z-10 border-b border-line bg-white/85 backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/85">
             <div className="mx-auto flex h-[62px] max-w-6xl items-center gap-3 px-4">
-              <Link href="/" className="flex items-center gap-2.5 rounded-control focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand">
-                <BrandMark className="h-8 w-8" />
-                <span className="text-[19px] font-extrabold tracking-[-0.03em] text-ink dark:text-gray-50">약핏</span>
-                {/* 기본 산세리프로 둬야 작은 크기에서도 Y가 V처럼 뭉개지지 않는다. */}
-                <span className="hidden text-[11px] font-bold tracking-[0.16em] text-sub sm:inline dark:text-gray-400">YAKFIT</span>
+              {/* 심볼·보조 영문 표기 없이 "약핏" 글자만 두는 깔끔한 워드마크. */}
+              <Link
+                href="/"
+                className="rounded-control text-xl font-extrabold tracking-[-0.03em] text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand dark:text-gray-50"
+              >
+                약핏
               </Link>
               <div className="ml-auto flex items-center gap-2 text-sm">
                 <LocationIndicator />
@@ -59,10 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <footer className="mx-[calc(50%-50vw)] w-screen border-t border-line bg-mist dark:border-gray-800 dark:bg-gray-950">
             <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-2">
-                  <BrandMark className="h-6 w-6" />
-                  <span className="text-base font-extrabold tracking-[-0.03em] text-ink dark:text-gray-50">약핏</span>
-                </div>
+                <span className="text-base font-extrabold tracking-[-0.03em] text-ink dark:text-gray-50">약핏</span>
                 <p className="max-w-md text-[13px] leading-[1.7] text-sub dark:text-gray-400">
                   표시되는 가격은 이용자 제보와 수집 데이터를 바탕으로 한 참고 정보이며, 실제 판매가와 다를 수 있습니다. 정확한
                   가격과 재고는 방문 전 약국에 확인해주세요.
