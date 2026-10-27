@@ -24,7 +24,8 @@ export function AuthStatus() {
           관리자
         </Link>
       )}
-      <Link href="/me" className="rounded-control px-2.5 py-2 text-ink hover:bg-mist dark:text-gray-200 dark:hover:bg-gray-800">
+      {/* 모바일에선 헤더 폭이 모자라 숨긴다 — 내 정보는 푸터 링크로도 갈 수 있다. */}
+      <Link href="/me" className="hidden rounded-control px-2.5 py-2 text-ink sm:block hover:bg-mist dark:text-gray-200 dark:hover:bg-gray-800">
         {user.nickname}님
       </Link>
       <button
