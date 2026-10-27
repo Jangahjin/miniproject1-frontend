@@ -43,7 +43,7 @@ export function RegionPicker({
         <button
           type="button"
           onClick={onUseGps}
-          className="mb-2 w-full rounded-lg border border-gray-200 px-3 py-1.5 text-left text-xs font-medium text-gray-700 hover:border-blue-400 hover:text-blue-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-500 dark:hover:text-blue-400"
+          className="mb-2 w-full rounded-lg border border-gray-200 px-3 py-1.5 text-left text-xs font-medium text-gray-700 hover:border-brand hover:text-brand dark:border-gray-700 dark:text-gray-300 dark:hover:border-sky-400 dark:hover:text-sky-300"
         >
           📍 내 위치 사용
         </button>
@@ -59,7 +59,7 @@ export function RegionPicker({
                 type="button"
                 disabled={sigungu.pharmacyCount === 0}
                 onClick={() => onSelect(sigungu.code, sigungu.centerLat, sigungu.centerLng)}
-                className="rounded-full border border-gray-200 px-2 py-1 text-xs text-gray-700 hover:border-blue-400 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-500 dark:hover:text-blue-400"
+                className="rounded-full border border-gray-200 px-2 py-1 text-xs text-gray-700 hover:border-brand hover:text-brand disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:text-gray-300 dark:hover:border-sky-400 dark:hover:text-sky-300"
               >
                 {sigungu.sigungu}
               </button>

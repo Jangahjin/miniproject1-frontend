@@ -69,7 +69,7 @@ export default async function PharmacyDetailPage({ params, searchParams }: Pharm
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       <PharmacyImageCarousel pharmacyName={pharmacy.name} />
 
-      <section className="flex flex-col gap-3 rounded-none border-2 border-gray-950 bg-white p-4 dark:border-gray-50 dark:bg-gray-900">
+      <section className="flex flex-col gap-3 card p-6">
         <h1 className="text-2xl font-black text-gray-950 dark:text-gray-50">{pharmacy.name}</h1>
 
         <div className="flex flex-col gap-1 text-sm text-gray-600 dark:text-gray-300">
@@ -77,7 +77,7 @@ export default async function PharmacyDetailPage({ params, searchParams }: Pharm
             <span>{pharmacy.addressRoad}</span>
             {pharmacy.distanceM !== null && <DistanceBadge meters={pharmacy.distanceM} />}
           </p>
-          <a href={`tel:${pharmacy.phone}`} className="w-fit text-blue-600 hover:underline dark:text-blue-400">
+          <a href={`tel:${pharmacy.phone}`} className="w-fit text-brand hover:underline dark:text-sky-400">
             {pharmacy.phone}
           </a>
         </div>
@@ -87,7 +87,7 @@ export default async function PharmacyDetailPage({ params, searchParams }: Pharm
             href={`https://map.kakao.com/link/to/${encodeURIComponent(pharmacy.name)},${pharmacy.lat},${pharmacy.lng}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-none border-2 border-gray-950 px-3 py-1.5 text-sm font-semibold uppercase tracking-wide text-gray-950 transition-colors hover:bg-gray-950 hover:text-white dark:border-gray-50 dark:text-gray-50 dark:hover:bg-gray-50 dark:hover:text-gray-950"
+            className="btn-secondary"
           >
             길찾기
           </a>
@@ -95,14 +95,14 @@ export default async function PharmacyDetailPage({ params, searchParams }: Pharm
               어긋나게 깔리고, 누르면 눌리는 듯 섀도우가 줄어든다. */}
           <Link
             href={`/reports/new?pharmacyId=${pharmacy.id}`}
-            className="rounded-none border-2 border-gray-950 bg-gray-950 px-3 py-1.5 text-sm font-semibold uppercase tracking-wide text-white shadow-[3px_3px_0_0_#2563eb] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_#2563eb] active:translate-x-0 active:translate-y-0 active:shadow-[1px_1px_0_0_#2563eb] dark:border-gray-50 dark:bg-gray-50 dark:text-gray-950 dark:shadow-[3px_3px_0_0_#60a5fa] dark:hover:shadow-[5px_5px_0_0_#60a5fa] dark:active:shadow-[1px_1px_0_0_#60a5fa]"
+            className="btn-primary"
           >
             이 약국에 가격 제보하기
           </Link>
         </div>
       </section>
 
-      <section className="rounded-none border-2 border-gray-950 bg-white p-4 dark:border-gray-50 dark:bg-gray-900">
+      <section className="card p-6">
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">영업시간</h2>
         <ul className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm sm:grid-cols-4">
           {orderedHours.map((day) => {
@@ -111,7 +111,7 @@ export default async function PharmacyDetailPage({ params, searchParams }: Pharm
             return (
               <li
                 key={day}
-                className={`flex justify-between gap-2 ${isToday ? "font-semibold text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-300"}`}
+                className={`flex justify-between gap-2 ${isToday ? "font-semibold text-brand dark:text-sky-400" : "text-gray-600 dark:text-gray-300"}`}
               >
                 <span>{DAY_LABEL[day] ?? day}</span>
                 <span className={hours ? "" : "text-gray-500 dark:text-gray-400"}>
@@ -123,7 +123,7 @@ export default async function PharmacyDetailPage({ params, searchParams }: Pharm
         </ul>
       </section>
 
-      <section className="rounded-none border-2 border-gray-950 bg-white p-4 dark:border-gray-50 dark:bg-gray-900">
+      <section className="card p-6">
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">취급 의약품</h2>
         <PharmacyDrugPrices pharmacyId={pharmacy.id} drugPrices={pharmacy.drugPrices} />
       </section>

@@ -69,7 +69,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         </p>
         <Link
           href="/"
-          className="mt-2 rounded-none border-2 border-gray-950 bg-gray-950 px-5 py-2.5 text-sm font-semibold uppercase tracking-wide text-white hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 dark:border-gray-50 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200"
+          className="mt-2 btn-primary"
         >
           홈으로 가기
         </Link>
@@ -107,7 +107,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       {data.suggestion?.type === "EXPAND_RADIUS" ? (
         <Link
           href={buildExpandedRadiusHref(currentSearchParams, data.suggestion.recommendedRadius)}
-          className="font-medium text-blue-600 hover:underline dark:text-blue-400"
+          className="font-medium text-brand hover:underline dark:text-sky-400"
         >
           반경을 {data.suggestion.recommendedRadius / 1000}km로 넓히면{" "}
           {data.suggestion.estimatedCount}곳이 있습니다
@@ -122,19 +122,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1 border-b-2 border-gray-950 pb-4 dark:border-gray-50">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-blue-700/80 dark:text-blue-300/80">
-          검색 결과
-        </p>
-        <h1 className="text-2xl font-black text-gray-950 dark:text-gray-50">{data.drug.displayName}</h1>
+      <div className="flex flex-col gap-1 border-b border-line pb-4 dark:border-gray-800">
+        {/* 한글에 넓은 자간(0.25em)을 주면 "검 색 결 과"처럼 글자가 흩어져 보여 기본 자간으로 둔다. */}
+        <p className="text-xs font-bold text-brand dark:text-sky-400">검색 결과</p>
+        <h1 className="text-2xl font-extrabold tracking-[-0.02em] text-ink sm:text-[28px] dark:text-gray-50">{data.drug.displayName}</h1>
         {data.summary.resultCount > 0 && (
           <p className="text-sm text-gray-600 dark:text-gray-400">
             반경 {radius < 1000 ? `${radius}m` : `${radius / 1000}km`} 내{" "}
-            <span className="font-serif font-semibold tabular-nums text-gray-950 dark:text-gray-50">{data.summary.resultCount}</span>곳
+            <span className="font-bold tabular-nums text-ink dark:text-gray-50">{data.summary.resultCount}</span>곳
             {data.summary.maxSaving ? (
-              <span className="text-blue-600 dark:text-blue-400">
+              <span className="font-semibold text-mint-strong dark:text-mint">
                 {" "}
-                · 최대 <span className="font-serif tabular-nums">{data.summary.maxSaving}</span>원 절약 가능
+                · 최대 <span className="tabular-nums">{data.summary.maxSaving.toLocaleString("ko-KR")}</span>원 절약 가능
               </span>
             ) : (
               ""

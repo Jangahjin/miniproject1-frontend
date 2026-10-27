@@ -34,7 +34,7 @@ export function SortToggle({
           aria-current={sort === current ? "true" : undefined}
           className={`border-b-2 pb-2 font-medium transition-colors ${
             sort === current
-              ? "border-gray-950 text-gray-950 dark:border-gray-50 dark:text-gray-50"
+              ? "border-brand text-brand dark:border-sky-400 dark:text-sky-300"
               : "border-transparent text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
           }`}
         >
@@ -59,10 +59,10 @@ export function RadiusFilter({
           key={radius}
           href={buildHref(searchParams, { radius: String(radius) })}
           aria-current={radius === current ? "true" : undefined}
-          className={`rounded-none border px-3 py-1 font-serif font-medium tabular-nums transition-colors ${
+          className={`rounded-full border px-3.5 py-1.5 text-[13px] font-semibold tabular-nums transition-colors ${
             radius === current
-              ? "border-blue-950 bg-blue-950 text-white dark:border-sky-400 dark:bg-sky-400 dark:text-blue-950"
-              : "border-gray-300 text-gray-600 hover:border-gray-950 hover:text-gray-950 dark:border-gray-700 dark:text-gray-400 dark:hover:border-gray-50 dark:hover:text-gray-50"
+              ? "border-brand bg-brand text-white dark:border-sky-400 dark:bg-sky-400 dark:text-brand-deep"
+              : "border-line bg-white text-sub hover:border-brand hover:text-brand dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:border-sky-400 dark:hover:text-sky-300"
           }`}
         >
           {radius < 1000 ? `${radius}m` : `${radius / 1000}km`}

@@ -37,10 +37,10 @@ const BADGE_LABEL: Record<string, string> = {
 };
 
 const BADGE_STYLE: Record<string, string> = {
-  LOWEST_PRICE: "border-green-600 text-green-700 dark:border-green-400 dark:text-green-300",
+  LOWEST_PRICE: "border-mint bg-mint-soft text-mint-strong dark:border-mint/60 dark:bg-mint/10 dark:text-mint",
   LOW_CONFIDENCE: "border-gray-400 text-gray-600 dark:border-gray-600 dark:text-gray-300",
   STALE_DATA: "border-amber-600 text-amber-700 dark:border-amber-400 dark:text-amber-300",
-  NEAREST: "border-sky-600 text-sky-700 dark:border-sky-400 dark:text-sky-300",
+  NEAREST: "border-brand/30 bg-brand-soft text-brand dark:border-sky-400/50 dark:bg-sky-400/10 dark:text-sky-300",
 };
 
 export function PharmacyResultCard({
@@ -59,9 +59,9 @@ export function PharmacyResultCard({
       aria-current={item.recommended ? "true" : undefined}
       onMouseEnter={onMouseEnter}
       ref={listRef}
-      className={`flex flex-col gap-1.5 p-4 transition-all hover:-translate-y-0.5 hover:bg-gray-50 dark:hover:bg-gray-800 ${item.recommended ? "border-l-4 border-blue-950 bg-blue-50/40 dark:border-sky-400 dark:bg-blue-950/30" : ""} ${isSelected ? "!bg-sky-50 ring-2 ring-inset ring-sky-400 dark:!bg-sky-950/40" : ""}`}
+      className={`flex flex-col gap-1.5 p-4 transition-all hover:-translate-y-0.5 hover:bg-gray-50 dark:hover:bg-gray-800 ${item.recommended ? "border-l-4 border-mint bg-mint-soft/50 dark:bg-mint/5" : ""} ${isSelected ? "!bg-brand-soft ring-2 ring-inset ring-brand dark:!bg-sky-950/40 dark:ring-sky-400" : ""}`}
     >
-      <Link href={`/pharmacies/${item.pharmacy.id}`} className="font-semibold text-gray-900 hover:text-sky-600 dark:text-gray-100 dark:hover:text-sky-400">
+      <Link href={`/pharmacies/${item.pharmacy.id}`} className="font-bold text-ink hover:text-brand dark:text-gray-100 dark:hover:text-sky-300">
         {item.pharmacy.name}
       </Link>
       <p className="text-sm text-gray-500 dark:text-gray-400">{item.pharmacy.addressRoad}</p>
@@ -82,7 +82,7 @@ export function PharmacyResultCard({
         <p
           className={`text-xs font-medium ${
             item.price.savingVsCandidateAvg > 0
-              ? "text-blue-600 dark:text-blue-400"
+              ? "font-bold text-mint-strong dark:text-mint"
               : "text-gray-500 dark:text-gray-400"
           }`}
         >
@@ -96,7 +96,7 @@ export function PharmacyResultCard({
           {item.badges.map((badge) => (
             <span
               key={badge}
-              className={`rounded-none border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${BADGE_STYLE[badge] ?? "border-gray-400 text-gray-600"}`}
+              className={`rounded-full border px-2 py-0.5 text-[11px] font-bold ${BADGE_STYLE[badge] ?? "border-gray-400 text-gray-600"}`}
             >
               {BADGE_LABEL[badge] ?? badge}
             </span>

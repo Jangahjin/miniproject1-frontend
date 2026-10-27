@@ -51,7 +51,7 @@ function LoginForm() {
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center py-8">
-    <div className="mx-auto flex w-full max-w-sm flex-col gap-6 rounded-none border-2 border-gray-950 bg-white p-8 dark:border-gray-50 dark:bg-gray-900">
+    <div className="mx-auto flex w-full max-w-sm flex-col gap-6 card p-8">
       <h1 className="text-center text-xl font-black text-gray-950 dark:text-gray-50">로그인</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -66,7 +66,7 @@ function LoginForm() {
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? "email-error" : undefined}
             {...register("email")}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+            className="input-field"
           />
           {errors.email && (
             <p id="email-error" role="alert" className="text-xs text-red-600 dark:text-red-400">
@@ -86,7 +86,7 @@ function LoginForm() {
             aria-invalid={!!errors.password}
             aria-describedby={errors.password ? "password-error" : undefined}
             {...register("password")}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+            className="input-field"
           />
           {errors.password && (
             <p id="password-error" role="alert" className="text-xs text-red-600 dark:text-red-400">
@@ -104,7 +104,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-none border-2 border-gray-950 bg-gray-950 px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white shadow-[3px_3px_0_0_#2563eb] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_#2563eb] active:translate-x-0 active:translate-y-0 active:shadow-[1px_1px_0_0_#2563eb] disabled:pointer-events-none disabled:opacity-50 dark:border-gray-50 dark:bg-gray-50 dark:text-gray-950 dark:shadow-[3px_3px_0_0_#60a5fa] dark:hover:shadow-[5px_5px_0_0_#60a5fa] dark:active:shadow-[1px_1px_0_0_#60a5fa]"
+          className="btn-primary"
         >
           {isSubmitting ? "로그인 중..." : "로그인"}
         </button>
@@ -112,7 +112,7 @@ function LoginForm() {
 
       <p className="text-center text-sm text-gray-500 dark:text-gray-400">
         아직 계정이 없으신가요?{" "}
-        <Link href="/signup" className="font-medium text-blue-600 hover:underline dark:text-blue-400">
+        <Link href="/signup" className="font-medium text-brand hover:underline dark:text-sky-400">
           회원가입
         </Link>
       </p>

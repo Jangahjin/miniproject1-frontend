@@ -121,7 +121,7 @@ export default function MyReportsPage() {
           <EmptyState message="아직 제보한 가격이 없습니다." />
           <Link
             href="/reports/new"
-            className="rounded-none border-2 border-gray-950 bg-gray-950 px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white shadow-[3px_3px_0_0_#2563eb] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_#2563eb] dark:border-gray-50 dark:bg-gray-50 dark:text-gray-950 dark:shadow-[3px_3px_0_0_#60a5fa] dark:hover:shadow-[5px_5px_0_0_#60a5fa]"
+            className="btn-primary"
           >
             첫 가격을 제보해보세요
           </Link>

@@ -1,10 +1,10 @@
 import { formatPrice } from "@/lib/format";
 
-// font-serif(Fraunces)는 라틴 문자에만 적용된다 — "원"은 시스템 한글 폰트로 남고
-// 숫자만 대비되는 세리프로 바뀌어 가격이 시각적으로 두드러진다.
+// 예전엔 숫자만 세리프(Fraunces)로 바꿔 강조했지만, Pretendard로 통일한 뒤엔 한 줄 안에서
+// 폰트가 섞여 보였다 — 같은 폰트의 굵기(extrabold)와 고정폭 숫자(tabular-nums)로 강조한다.
 export function PriceTag({ price }: { price: number }) {
   return (
-    <span className="font-serif font-semibold tabular-nums text-gray-950 dark:text-gray-50">
+    <span className="font-extrabold tracking-[-0.01em] tabular-nums text-ink dark:text-gray-50">
       {formatPrice(price)}
     </span>
   );

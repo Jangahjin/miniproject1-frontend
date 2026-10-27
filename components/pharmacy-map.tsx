@@ -57,18 +57,19 @@ export interface MapMarkerData {
   rank: number;
 }
 
-// 1위(최저가) 마커는 남색, 나머지는 검정에 가까운 회색으로 구분한다. 선택된 마커는
-// 하늘색 테두리 + 살짝 확대로 강조한다 — 1위 색상(rank===1)과는 별개 축이라
+// 1위(최저가) 마커는 "최저가" 의미 색인 민트, 나머지는 브랜드 남색(brand-deep)으로 구분한다.
+// 선택된 마커는 흰 링 + 남색 테두리 + 살짝 확대로 강조한다 — 1위 색상(rank===1)과는 별개 축이라
 // "1위이면서 선택됨"도 동시에 표현된다. (예전엔 scale(1.3)이라 반응이 과했다.)
 function buildOverlayHtml(item: MapMarkerData, isSelected: boolean): string {
-  const background = item.rank === 1 ? "#172554" : "#111827";
+  const background = item.rank === 1 ? "#6FD3A4" : "#13233F";
+  const color = item.rank === 1 ? "#13233F" : "#FFFFFF";
   const highlight = isSelected
-    ? "box-shadow:0 0 0 2px #0ea5e9;transform:scale(1.12);z-index:10;position:relative;animation:pharmacy-marker-selected-pulse 1.2s ease-in-out infinite;"
+    ? "box-shadow:0 0 0 2px #fff,0 0 0 4px #1F3C66;transform:scale(1.12);z-index:10;position:relative;animation:pharmacy-marker-selected-pulse 1.2s ease-in-out infinite;"
     : "";
   const badge = isSelected
-    ? `<span style="position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:4px;background:#0ea5e9;color:#ffffff;padding:1px 6px;border-radius:9999px;font-size:10px;font-weight:700;white-space:nowrap;">선택됨</span>`
+    ? `<span style="position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:4px;background:#1F3C66;color:#ffffff;padding:1px 6px;border-radius:9999px;font-size:10px;font-weight:700;white-space:nowrap;">선택됨</span>`
     : "";
-  return `<div style="background:${background};color:#fff;padding:2px 6px;border-radius:4px;font-size:12px;white-space:nowrap;transition:transform .15s ease;${highlight}">${badge}${item.price.toLocaleString("ko-KR")}원</div>`;
+  return `<div style="background:${background};color:${color};padding:3px 8px;border-radius:8px;font-size:12px;font-weight:700;box-shadow:0 4px 10px rgba(19,35,63,.25);white-space:nowrap;transition:transform .15s ease;${highlight}">${badge}${item.price.toLocaleString("ko-KR")}원</div>`;
 }
 
 export function PharmacyMap({

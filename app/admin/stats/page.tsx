@@ -38,7 +38,7 @@ export default function AdminStatsPage() {
             onClick={() => setActiveTab(tab.key)}
             className={`shrink-0 whitespace-nowrap pb-2 ${
               activeTab === tab.key
-                ? "border-b-2 border-blue-600 font-semibold text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                ? "border-b-2 border-brand font-semibold text-brand dark:border-sky-400 dark:text-sky-400"
                 : "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
             }`}
           >
